@@ -1,0 +1,114 @@
+# Efinity generated flow outputs
+/outflow/
+/images/*/outflow/
+/images/*/work_*/
+/images/*/RUNPNR_*/
+/images/*/RUNPNR_*
+/images/*/.lock
+/images/*/debug_profile.mark_debug.json
+/generated_artifacts_pending_cleanup/
+/work_*/
+/Ti60_Photo*.*
+/photo_capture_check.*
+/debug_profile.mark_debug.json
+/work_syn/
+/work_pnr/
+/work_pt/
+/work_sim/
+/RUNPNR_*
+
+# Local temporary files
+/samples/image2_uart/
+/tmp/
+/temp/
+
+# Simulator-generated databases and waveforms
+**/Testbench/work/
+**/Testbench/transcript
+**/*.wlf
+**/*.mti
+**/*.qdb
+**/*.qpg
+**/*.qtl
+/xsim.dir/
+/*.wdb
+/xelab.log
+/xelab.pb
+/xsim.jou
+/xsim.log
+/xvlog.log
+/xvlog.pb
+/xsim_*.backup.*
+/*_test*.log
+/*_freeze_test*.log
+
+# Editor and operating-system files
+*.bak
+*.tmp
+*.swp
+*~
+.DS_Store
+Thumbs.db
+Desktop.ini
+/.lock
+
+# Added by git-safe-edit
+.claude-bootstrap-backups/
+.claude/settings.local.json
+.codex/
+.env
+.env.*
+*.env
+*.key
+*.pem
+*.p12
+*.pfx
+*token*
+*secret*
+*api_key*
+*apikey*
+node_modules/
+dist/
+build/
+/reference_projects/
+Debug/
+Release/
+*.o
+*.obj
+__pycache__/
+*.py[cod]
+*.elf
+*.bin
+*.hex
+*.map
+~$*
+
+# Published image1 prebuilt files for a ready-to-use main checkout
+!/releases/image1/Ti60_Image1_Vision.hex
+
+# image6 resource probe generated files
+/images/image6_pose_int16/probe/outflow/
+/images/image6_pose_int16/probe/work_*/
+/images/image6_pose_int16/probe/*.log
+/images/image6_pose_int16/probe/RUNPNR_*
+/releases/image6/*.zip
+/releases/image6/*.bit
+/releases/image6/test/*.u16
+/releases/image6/manifest.json
+/releases/image6/standalone/
+
+# Generated image7 release (source and tooling are tracked separately)
+/releases/image7/standalone/
+/releases/image7/*.zip
+/releases/image7/video_guard*/
+
+/releases/image7/menu*/
+
+# Generated three-image configuration Flash bundles
+/releases/multiboot/
+
+# Separately published image7 performance candidates; keep old releases intact.
+/releases/image7/performance*/
+
+# Generated image2 P4/menu releases; source and build tools remain tracked.
+/releases/image2/

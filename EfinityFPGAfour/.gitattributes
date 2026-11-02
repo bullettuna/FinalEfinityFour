@@ -1,0 +1,3 @@
+# FPGA programming images must keep their exact qualified bytes on all hosts.
+/releases/image1/*.bit binary
+/releases/image1/*.hex binary

@@ -1,0 +1,12 @@
+**** Efinity Programming Tool Generation Report *****
+Time: 2026-10-29 22:48
+
+Generated Multi Image output file: E:\Efinity_Project\EfinityFPGAfour\releases\multiboot\four_images_image1_guard_20261029\FLASH_IMAGE7_1_5_2_IMAGE1_GUARD.hex
+Device: Ti60F225
+Image type: internal
+CBSEL[1:0]  Flash Address  Length      Input Image File
+     2'b00  0x00000000     0x000fd4d0  E:\Efinity_Project\EfinityFPGAfour\releases\multiboot\four_images_image1_guard_20261029\fpga\image7.hex
+     2'b01  0x00280000     0x000f5c92  E:\Efinity_Project\EfinityFPGAfour\releases\multiboot\four_images_image1_guard_20261029\fpga\image1.hex
+     2'b10  0x00500000     0x000c41c4  E:\Efinity_Project\EfinityFPGAfour\releases\multiboot\four_images_image1_guard_20261029\fpga\image5.hex
+     2'b11  0x00680000     0x000e6e7a  E:\Efinity_Project\EfinityFPGAfour\releases\multiboot\four_images_image1_guard_20261029\fpga\image2.hex
+

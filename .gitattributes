@@ -1,0 +1,43 @@
+# 二进制文件：禁止任何换行符转换，否则 .bit/.hex 会在 checkout 时损坏
+*.bit   binary
+*.hex   binary
+*.bin   binary
+*.bin.gz binary
+*.pgm   binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.zip   binary
+*.7z    binary
+*.rar   binary
+*.gz    binary
+*.npz   binary
+*.pt    binary
+*.onnx  binary
+*.pickle binary
+*.pkl   binary
+*.lib   binary
+*.dll   binary
+*.exe   binary
+*.pyd   binary
+*.pdf   binary
+
+# 文本文件统一以 LF 存储（Windows 检出时按 autocrlf 转换）
+*.v      text
+*.vh     text
+*.sv     text
+*.svh    text
+*.py     text
+*.ps1    text
+*.md     text
+*.json   text
+*.txt    text
+*.csv    text
+*.xml    text
+*.sdc    text
+*.ini    text
+*.rpt    text
+*.html   text
+*.cmd    text

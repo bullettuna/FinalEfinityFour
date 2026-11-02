@@ -1,0 +1,36 @@
+{
+  "profile": "image7_mocap11_a",
+  "project": "Ti60_Image7_Four_Boot",
+  "source_hdl_commit": "9fe8ca7",
+  "source_qualification": "E:\\Efinity_Project\\FPGA_GAME\\outputs\\fourpoint\\mocap11\\image7_a11_int16_v2",
+  "checkpoint_sha256": "834c26d5fc3389bf4a0b1ee9ae180fb76f6c0930b2f4ca6ff7a6e6ac88a3f5c5",
+  "model_crc32": "1f704b5e",
+  "keypoint_order": [
+    "head",
+    "left_shoulder",
+    "right_shoulder",
+    "left_elbow",
+    "right_elbow",
+    "left_wrist",
+    "right_wrist",
+    "left_hip",
+    "right_hip",
+    "left_knee",
+    "right_knee"
+  ],
+  "clock_hz": 96000000,
+  "lanes": 16,
+  "point_count": 11,
+  "sd_format": "I7MC1101",
+  "packet": {
+    "magic": "FT5!",
+    "version": 2,
+    "kind": 5,
+    "payload_bytes": 86,
+    "total_bytes": 114
+  },
+  "min_peak": 25298,
+  "head_scale": 2.170415609725751e-05,
+  "head_zero": 16083,
+  "hardware_tested": false
+}

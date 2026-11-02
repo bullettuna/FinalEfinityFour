@@ -1,0 +1,2 @@
+localparam POSE6_MODEL_BYTES=162592;
+localparam [31:0] POSE6_MODEL_CRC=32'h1f704b5e;

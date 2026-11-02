@@ -1,0 +1,56 @@
+{
+  "profile": "photo-upper-v1: torso and both arms; no head/neck or legs",
+  "input_framing": "neck/shoulders through waist, both arms and hands in frame",
+  "method": "Manual polygon annotation of visible upper-body silhouette in original supplied photographs. No generative reconstruction or skeleton thickening. Approximate borders, not pixel-perfect ground truth. Head/neck/legs excluded by manual outline; hands retained where visible.",
+  "annotation_sha256": "6804a25fc47f7998cfb2e91952535c985c780c6b6b4650d08089e14e1bfa49ce",
+  "mapping_image_sides": {
+    "1": "arms down",
+    "2": "image right horizontal",
+    "3": "image left horizontal",
+    "4": "image right raised",
+    "5": "image left raised"
+  },
+  "normalization": "64x64 nearest center, tight largest 8-connected mask, dark<=127",
+  "samples": [
+    {
+      "pose": 1,
+      "sha256": "bcf39db12f17ddcb2658000c2a3f320f1f80aae9a41d84d3ebea2f61c2c022f7",
+      "foreground": 2751,
+      "boundary": 359,
+      "photo": 7,
+      "photo_sha256": "e88ec5eefc1a00dc065f8748c08aac52325e5a830380fabf4336439fee15bd13"
+    },
+    {
+      "pose": 2,
+      "sha256": "90025b89c4be0dc0ea2d31bef2f7d86782a141c1db7b8451abec40bdecf7792d",
+      "foreground": 1471,
+      "boundary": 257,
+      "photo": 8,
+      "photo_sha256": "7dd2fcd5aad017a05b875a0cff41387d0e576a5d8c2ec6a23e63839e2f7ce5c6"
+    },
+    {
+      "pose": 3,
+      "sha256": "b91c66dbae7f57ba7f45866ef133c1c32a63dabb777afa01d71b5c202ad0c97a",
+      "foreground": 1508,
+      "boundary": 259,
+      "photo": 10,
+      "photo_sha256": "2caa6942646758531ecaf73f098b2f5de5bcde34120c90857e3a67c756454e44"
+    },
+    {
+      "pose": 4,
+      "sha256": "89753cddff12be086c5e7fe3a122d5110a4ed32e40130ef349b38473ffcac056",
+      "foreground": 1051,
+      "boundary": 263,
+      "photo": 9,
+      "photo_sha256": "e108dc35cd48842740086d950d3696c137aecb7539582483c0fab3c260a2a51e"
+    },
+    {
+      "pose": 5,
+      "sha256": "a0f0e1eb361467e9922d234aa63e3772725005f7b604456eb0625e4744a8f99e",
+      "foreground": 1469,
+      "boundary": 256,
+      "photo": 4,
+      "photo_sha256": "e6f43a6a909edeb5b7e06daacea2ff8d754490b53968cd15e1ce6c7f7eafce0c"
+    }
+  ]
+}

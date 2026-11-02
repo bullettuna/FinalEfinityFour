@@ -1,0 +1,690 @@
+[
+  {
+    "path": "images/image7_usb_points/outflow/Ti60_Image7_USB_Points.bit",
+    "sha256": "d4ddc552faaedc818af89a14f8c165d691779fa6bc89472ff9de22f9368b9b8e"
+  },
+  {
+    "path": "images/image7_usb_points/outflow/Ti60_Image7_USB_Points.hex",
+    "sha256": "a37598d7bc6ad7f894cab478696f287bc819cf98774f19acf2d44df3e2b55029"
+  },
+  {
+    "path": "images/image7_usb_points/outflow/Ti60_Image7_USB_Points_multiboot_checked.bit",
+    "sha256": "d4ddc552faaedc818af89a14f8c165d691779fa6bc89472ff9de22f9368b9b8e"
+  },
+  {
+    "path": "images/image7_usb_points/outflow/Ti60_Image7_USB_Points_multiboot_checked.hex",
+    "sha256": "a37598d7bc6ad7f894cab478696f287bc819cf98774f19acf2d44df3e2b55029"
+  },
+  {
+    "path": "images/image7_stable_ui/outflow/Ti60_Image7_Stable_UI.bit",
+    "sha256": "64b83983c26ae6f97e148edd1e3a58ebc844e7fce15680f4feab2c0abe5cecd2"
+  },
+  {
+    "path": "images/image7_stable_ui/outflow/Ti60_Image7_Stable_UI.hex",
+    "sha256": "aba18516bcc9602a19ce17be4f705e90b722d9903fb4855d6ddeb669315e1a48"
+  },
+  {
+    "path": "images/image7_stable_ui/outflow/Ti60_Image7_Stable_UI_multiboot_checked.bit",
+    "sha256": "64b83983c26ae6f97e148edd1e3a58ebc844e7fce15680f4feab2c0abe5cecd2"
+  },
+  {
+    "path": "images/image7_stable_ui/outflow/Ti60_Image7_Stable_UI_multiboot_checked.hex",
+    "sha256": "aba18516bcc9602a19ce17be4f705e90b722d9903fb4855d6ddeb669315e1a48"
+  },
+  {
+    "path": "images/image7_perf_a/outflow/Ti60_Image7_Perf_A.bit",
+    "sha256": "8aa373f03c728111674ae57daa11d25bff7d9a8182ef154561228c846be5d427"
+  },
+  {
+    "path": "images/image7_perf_a/outflow/Ti60_Image7_Perf_A.hex",
+    "sha256": "1da07a7fd9141d97443944cf2718be3a46cc6981dcfd56e0ddcbdbe58b70d1ee"
+  },
+  {
+    "path": "images/image7_mocap11_a/outflow/Ti60_Image7_Mocap11_A.bit",
+    "sha256": "9711b9581426a4ae948286a88ea0eecfb0fa2cb67995fd2145f1dee0abef1c05"
+  },
+  {
+    "path": "images/image7_mocap11_a/outflow/Ti60_Image7_Mocap11_A.hex",
+    "sha256": "6dd0515c81c15cc7d8cefd13f3f675dc4833020389761a88f3b83c1f46b4c534"
+  },
+  {
+    "path": "images/image7_mocap11_a/outflow/Ti60_Image7_Mocap11_A_multiboot_checked.bit",
+    "sha256": "9711b9581426a4ae948286a88ea0eecfb0fa2cb67995fd2145f1dee0abef1c05"
+  },
+  {
+    "path": "images/image7_mocap11_a/outflow/Ti60_Image7_Mocap11_A_multiboot_checked.hex",
+    "sha256": "6dd0515c81c15cc7d8cefd13f3f675dc4833020389761a88f3b83c1f46b4c534"
+  },
+  {
+    "path": "images/image7_mocap11_a/outflow/Ti60_Image7_Mocap11_A_timing_checked.bit",
+    "sha256": "b7476606329cd0a11149d677061cb9ec2af10568147f659301c7bdd64ab0135d"
+  },
+  {
+    "path": "images/image7_latest_a/outflow/Ti60_Image7_Latest_A.bit",
+    "sha256": "f013fe5c24a56560b14f89bc14100705222d0fbcb5fcb965ff09fc74b6c08f46"
+  },
+  {
+    "path": "images/image7_latest_a/outflow/Ti60_Image7_Latest_A.hex",
+    "sha256": "bc9eb61462db6c2ddb8e671b3a2ff87ef6f27d8f4fc50aeebdd34217cc9fcef6"
+  },
+  {
+    "path": "images/image7_four_boot/outflow/Ti60_Image7_Four_Boot.bit",
+    "sha256": "f1c658d245ce16f34c054093f23a6a82320beeae1991c09e003a96b57471a9f0"
+  },
+  {
+    "path": "images/image7_four_boot/outflow/Ti60_Image7_Four_Boot.hex",
+    "sha256": "047007b80aa38a141da58e03d451deb7aa0dd3e0d23d12109ab55ced381fc40c"
+  },
+  {
+    "path": "images/image7_four_boot/outflow/Ti60_Image7_Four_Boot_checked.bit",
+    "sha256": "f1c658d245ce16f34c054093f23a6a82320beeae1991c09e003a96b57471a9f0"
+  },
+  {
+    "path": "images/image7_four_boot/outflow/Ti60_Image7_Four_Boot_checked.hex",
+    "sha256": "047007b80aa38a141da58e03d451deb7aa0dd3e0d23d12109ab55ced381fc40c"
+  },
+  {
+    "path": "images/image6_pose_int16/outflow/Ti60_Image6_Pose.bit",
+    "sha256": "a79499d8409fd2cc42b75adb49983ea4a0c2a86ff71884a42ca0df19673235e2"
+  },
+  {
+    "path": "images/image6_pose_int16/outflow/Ti60_Image6_Pose.hex",
+    "sha256": "b74af46cc5062c25680afb8149e98d4472569fd8f42e1d12e6a295911c86da5d"
+  },
+  {
+    "path": "images/image6_pose_int16/outflow/Ti60_Image6_Pose_before_video_diag.bit",
+    "sha256": "3fc8d5d2e844595b418f621f6c04e191045a441c2cb2f555012bcc82f057d1bd"
+  },
+  {
+    "path": "images/image6_pose_int16/outflow/Ti60_Image6_Pose_sd_hdmi_margin007.bit",
+    "sha256": "0eb39972faece3670fe1e0e36b5a3a8bfd0a26eb833d49fe70868063d6346c3e"
+  },
+  {
+    "path": "images/image6_pose_int16/outflow/Ti60_Image6_Pose_timing_checked.bit",
+    "sha256": "a79499d8409fd2cc42b75adb49983ea4a0c2a86ff71884a42ca0df19673235e2"
+  },
+  {
+    "path": "images/image6_pose_int16/outflow/Ti60_Image6_Pose_video_diag.bit",
+    "sha256": "22cae6fcd59281d1d030a156b567122aecbf592cb0674b6661c40cbc92a9e66f"
+  },
+  {
+    "path": "images/image5_stable_ui/outflow/Ti60_Image5_Stable_UI.bit",
+    "sha256": "20d7f80062c7af4bad7a58bcabe632f6c9a2557ba69dd763bec212e0f3ed1145"
+  },
+  {
+    "path": "images/image5_stable_ui/outflow/Ti60_Image5_Stable_UI.hex",
+    "sha256": "3bbdc6ee9e81dcad384c7d81f34edf7b4937433d7949f8540404307308f7dbdf"
+  },
+  {
+    "path": "images/image5_stable_ui/outflow/Ti60_Image5_Stable_UI_multiboot_checked.bit",
+    "sha256": "20d7f80062c7af4bad7a58bcabe632f6c9a2557ba69dd763bec212e0f3ed1145"
+  },
+  {
+    "path": "images/image5_stable_ui/outflow/Ti60_Image5_Stable_UI_multiboot_checked.hex",
+    "sha256": "3bbdc6ee9e81dcad384c7d81f34edf7b4937433d7949f8540404307308f7dbdf"
+  },
+  {
+    "path": "images/image5_four_boot/outflow/Ti60_Image5_Four_Boot.bit",
+    "sha256": "064636d7fd1bb4e5d65153bcf1a361700d9d9e0843b042cfa280cbe7ce65f0bc"
+  },
+  {
+    "path": "images/image5_four_boot/outflow/Ti60_Image5_Four_Boot.hex",
+    "sha256": "554e5e4e7c1df267c23bc6598abb2235ab058fcf53378893f49e39fd3b298894"
+  },
+  {
+    "path": "images/image5_four_boot/outflow/Ti60_Image5_Four_Boot_checked.bit",
+    "sha256": "064636d7fd1bb4e5d65153bcf1a361700d9d9e0843b042cfa280cbe7ce65f0bc"
+  },
+  {
+    "path": "images/image5_four_boot/outflow/Ti60_Image5_Four_Boot_checked.hex",
+    "sha256": "554e5e4e7c1df267c23bc6598abb2235ab058fcf53378893f49e39fd3b298894"
+  },
+  {
+    "path": "images/image5_canny/outflow/Ti60_Image5_Canny.bit",
+    "sha256": "e7de5aed758763b8739735b1ae81eb6eb4f2024c17d0b4f127d5f9fab50cad2e"
+  },
+  {
+    "path": "images/image5_canny/outflow/Ti60_Image5_Canny.hex",
+    "sha256": "7427b8637532111466d3d155f8fb6a134d60306c6e5797c67ae89f73c325de18"
+  },
+  {
+    "path": "images/image5_canny/outflow/Ti60_Image5_Canny_checked.bit",
+    "sha256": "8058e112629a1c4842d7a7a1c0c7dc62d6dfc9bf896ffc983b0b35ace44d38c1"
+  },
+  {
+    "path": "images/image5_canny/outflow/Ti60_Image5_Canny_multiboot_checked.bit",
+    "sha256": "e7de5aed758763b8739735b1ae81eb6eb4f2024c17d0b4f127d5f9fab50cad2e"
+  },
+  {
+    "path": "images/image5_canny/outflow/Ti60_Image5_Canny_multiboot_checked.hex",
+    "sha256": "7427b8637532111466d3d155f8fb6a134d60306c6e5797c67ae89f73c325de18"
+  },
+  {
+    "path": "images/image4_skeleton/outflow/Ti60_Image4_Skeleton.hex",
+    "sha256": "dce88d1c24d6e222644e09916434c4da3dea44f4351231548cea9a00168a8230"
+  },
+  {
+    "path": "images/image4_skeleton/outflow/Ti60_Image4_Skeleton_checked.bit",
+    "sha256": "d41bdaf3e4cdfda2449eeb2d068f590dc3468669811b4d55df1e15ae5d07aae8"
+  },
+  {
+    "path": "images/image3_pose/outflow/Ti60_Image3_Pose.hex",
+    "sha256": "69c4cca3bd91e01be04bddd7789f8a30dd23df75f0f5259031f0853472431673"
+  },
+  {
+    "path": "images/image3_pose/outflow/Ti60_Image3_Pose_checked.bit",
+    "sha256": "2b7a416d227ba012014f3f40bdc033f6ee8b9bd188756d8a4231ba7e4df4982f"
+  },
+  {
+    "path": "images/image2_video_guard/outflow/Ti60_Image2_Video_Guard.bit",
+    "sha256": "995cac1f24f3e40701070bed28d05b12ef56e2650a3349418e042ca815995e8a"
+  },
+  {
+    "path": "images/image2_video_guard/outflow/Ti60_Image2_Video_Guard.hex",
+    "sha256": "c5941340cc79e6fe72e79108e6bd37b4fc5aa87ad17f9f95c1c97cd5254ba03c"
+  },
+  {
+    "path": "images/image2_video_guard/outflow/Ti60_Image2_Video_Guard_checked.bit",
+    "sha256": "995cac1f24f3e40701070bed28d05b12ef56e2650a3349418e042ca815995e8a"
+  },
+  {
+    "path": "images/image2_video_guard/outflow/Ti60_Image2_Video_Guard_checked.hex",
+    "sha256": "c5941340cc79e6fe72e79108e6bd37b4fc5aa87ad17f9f95c1c97cd5254ba03c"
+  },
+  {
+    "path": "images/image2_photo_status/outflow/Ti60_Image2_Photo_Status.bit",
+    "sha256": "d8259815e92d3de10e8f36340b45d4350b90cf249ef6337ae0509191981d1554"
+  },
+  {
+    "path": "images/image2_photo_status/outflow/Ti60_Image2_Photo_Status.hex",
+    "sha256": "225c257971c74718029e9d26d53067e86fe06f1225aacb2689f717f96c19afbd"
+  },
+  {
+    "path": "images/image2_photo_status/outflow/Ti60_Image2_Photo_Status_checked.bit",
+    "sha256": "d8259815e92d3de10e8f36340b45d4350b90cf249ef6337ae0509191981d1554"
+  },
+  {
+    "path": "images/image2_photo_status/outflow/Ti60_Image2_Photo_Status_checked.hex",
+    "sha256": "225c257971c74718029e9d26d53067e86fe06f1225aacb2689f717f96c19afbd"
+  },
+  {
+    "path": "images/image2_photo/outflow/Ti60_Image2_Photo.bit",
+    "sha256": "2ca5e869463a8f5396914e9ad114a725e1989430ac9aaaec2163496f01f1a5e8"
+  },
+  {
+    "path": "images/image2_photo/outflow/Ti60_Image2_Photo.hex",
+    "sha256": "b9851800d3c6ec09e955f7f1cbfe0079dd0060f349bdd4c0e4ce0ea95b6a78ed"
+  },
+  {
+    "path": "images/image2_photo/outflow/Ti60_Image2_Photo_checked.bit",
+    "sha256": "2ca5e869463a8f5396914e9ad114a725e1989430ac9aaaec2163496f01f1a5e8"
+  },
+  {
+    "path": "images/image2_photo/outflow/before_adc_p3_20261022/Ti60_Image2_Photo.hex",
+    "sha256": "7fcbed57174e0ae7d954e4d5443cbca51edd05b6b2bb60e80988153c50b8e4b5"
+  },
+  {
+    "path": "images/image2_photo/outflow/before_adc_p3_20261022/Ti60_Image2_Photo_checked.bit",
+    "sha256": "49fab6dc99afbe959d46622ba5e60206c222620bf89425e053a11c33ede98a76"
+  },
+  {
+    "path": "images/image2_photo/outflow/before_uart_export_20261022/Ti60_Image2_Photo.hex",
+    "sha256": "143445a847df9d4c579b16dcdd7c2b51d5097522c83298c4842230a76948be76"
+  },
+  {
+    "path": "images/image2_photo/outflow/before_uart_export_20261022/Ti60_Image2_Photo_checked.bit",
+    "sha256": "f453bff1bb3948a64b71e373be1019951771615acc4ba6699f26bae62e631f3c"
+  },
+  {
+    "path": "images/image2_p4_menu/outflow/Ti60_Image2_P4_Menu.bit",
+    "sha256": "1ed86a169009b134441cffcb7b00fd64cd7c0190c14f4baefeec108330e341bc"
+  },
+  {
+    "path": "images/image2_p4_menu/outflow/Ti60_Image2_P4_Menu.hex",
+    "sha256": "5542e4f44826e3976ba19283d0e96bd1b457670bf0c52a670cf945d8e9555eca"
+  },
+  {
+    "path": "images/image2_p4_menu/outflow/Ti60_Image2_P4_Menu_checked.bit",
+    "sha256": "1ed86a169009b134441cffcb7b00fd64cd7c0190c14f4baefeec108330e341bc"
+  },
+  {
+    "path": "images/image2_p4_menu/outflow/Ti60_Image2_P4_Menu_checked.hex",
+    "sha256": "5542e4f44826e3976ba19283d0e96bd1b457670bf0c52a670cf945d8e9555eca"
+  },
+  {
+    "path": "images/image2_four_boot/outflow/Ti60_Image2_Four_Boot.bit",
+    "sha256": "a7684cdf6481263620adea9d93ef8033eb2023ff85b4c20d001c310300343b40"
+  },
+  {
+    "path": "images/image2_four_boot/outflow/Ti60_Image2_Four_Boot.hex",
+    "sha256": "ef174cef9f28a9e80028f7a4a64f9083df3a5e574654001893866c755ec3774f"
+  },
+  {
+    "path": "images/image2_four_boot/outflow/Ti60_Image2_Four_Boot_checked.bit",
+    "sha256": "a7684cdf6481263620adea9d93ef8033eb2023ff85b4c20d001c310300343b40"
+  },
+  {
+    "path": "images/image2_four_boot/outflow/Ti60_Image2_Four_Boot_checked.hex",
+    "sha256": "ef174cef9f28a9e80028f7a4a64f9083df3a5e574654001893866c755ec3774f"
+  },
+  {
+    "path": "images/image1_vision/outflow/Ti60_Image1_Vision.bit",
+    "sha256": "8e39552c393cc4a165fa4b717d31e9226a35d0a8a4baac88d0806cad6cf55775"
+  },
+  {
+    "path": "images/image1_vision/outflow/Ti60_Image1_Vision.hex",
+    "sha256": "58635070fc1e20876a883055db17ae902c756e4a580ba891c05f3282c8018f29"
+  },
+  {
+    "path": "images/image1_vision/outflow/Ti60_Image1_Vision_checked.bit",
+    "sha256": "b83befafdb88c5bf8654772ef9a74313ca462b70b8ade3a647083b585b2ca97e"
+  },
+  {
+    "path": "images/image1_vision/outflow/Ti60_Image1_Vision_multiboot_checked.bit",
+    "sha256": "8e39552c393cc4a165fa4b717d31e9226a35d0a8a4baac88d0806cad6cf55775"
+  },
+  {
+    "path": "images/image1_vision/outflow/Ti60_Image1_Vision_multiboot_checked.hex",
+    "sha256": "58635070fc1e20876a883055db17ae902c756e4a580ba891c05f3282c8018f29"
+  },
+  {
+    "path": "images/image1_stable_ui/outflow/Ti60_Image1_Stable_UI.bit",
+    "sha256": "f286af7d5b0b1f991e66f670b32065943ad81632f1a0d854f718227d73f84115"
+  },
+  {
+    "path": "images/image1_stable_ui/outflow/Ti60_Image1_Stable_UI.hex",
+    "sha256": "1ea775ba561e85ce3286d897f8cd63a30eeb2452017bd5868b3a750d453ef012"
+  },
+  {
+    "path": "images/image1_four_boot/outflow/Ti60_Image1_Four_Boot.bit",
+    "sha256": "6fcbdf421f88b2bdd5420cfa062695f53c0df4283f5a79f8a52dcc7061a54680"
+  },
+  {
+    "path": "images/image1_four_boot/outflow/Ti60_Image1_Four_Boot.hex",
+    "sha256": "d906228f4f1d55c7104e6fc5625937af03cb860e007eedc1c1dd59fcd96977a0"
+  },
+  {
+    "path": "images/image1_four_boot/outflow/Ti60_Image1_Four_Boot_checked.bit",
+    "sha256": "6fcbdf421f88b2bdd5420cfa062695f53c0df4283f5a79f8a52dcc7061a54680"
+  },
+  {
+    "path": "images/image1_four_boot/outflow/Ti60_Image1_Four_Boot_checked.hex",
+    "sha256": "d906228f4f1d55c7104e6fc5625937af03cb860e007eedc1c1dd59fcd96977a0"
+  },
+  {
+    "path": "releases/image1/Ti60_Image1_Vision.hex",
+    "sha256": "7e5fdac82413de12dd3bb548bb6e68ad86b2fd317f4bf9cdbeeb5e02e1e5f979"
+  },
+  {
+    "path": "releases/image1/Ti60_Image1_Vision_checked.bit",
+    "sha256": "b83befafdb88c5bf8654772ef9a74313ca462b70b8ade3a647083b585b2ca97e"
+  },
+  {
+    "path": "releases/multiboot/four_images_20261029/FLASH_IMAGE7_1_5_2.hex",
+    "sha256": "47ea7296997411ee2bde7daee1a4f3c29e5c9e90042641935a4b5b1da105ae78"
+  },
+  {
+    "path": "releases/multiboot/image157_stable_ui_20261029/FLASH_IMAGE7_STABLE_1_5.hex",
+    "sha256": "efc56e43bb880125178403d49f5c1688f8b011563440fb383631d4499860009f"
+  },
+  {
+    "path": "releases/multiboot/image7_default_1_5/FLASH_IMAGE7_1_5.hex",
+    "sha256": "c5bb51dc5aca2030bee150449c3d04d13390d8b74114dfd5633bd4a40e9efe0c"
+  },
+  {
+    "path": "releases/multiboot/stable_ui_20261029/FLASH_IMAGE7_STABLE_1_5.hex",
+    "sha256": "efc56e43bb880125178403d49f5c1688f8b011563440fb383631d4499860009f"
+  },
+  {
+    "path": "releases/multiboot/usb_points_20261029/FLASH_IMAGE7_USB_POINTS_1_5.hex",
+    "sha256": "368410e88f4ccba16494fd67d2c372e9a9f93981cd88be56ab7267ee1926e4fd"
+  },
+  {
+    "path": "releases/multiboot/usb_points_20261029/baseline/image7_previous_stable.bit",
+    "sha256": "64b83983c26ae6f97e148edd1e3a58ebc844e7fce15680f4feab2c0abe5cecd2"
+  },
+  {
+    "path": "releases/multiboot/usb_points_20261029/fpga/image1_load.bit",
+    "sha256": "8e39552c393cc4a165fa4b717d31e9226a35d0a8a4baac88d0806cad6cf55775"
+  },
+  {
+    "path": "releases/multiboot/usb_points_20261029/fpga/image1_load.hex",
+    "sha256": "58635070fc1e20876a883055db17ae902c756e4a580ba891c05f3282c8018f29"
+  },
+  {
+    "path": "releases/multiboot/usb_points_20261029/fpga/image5_stable_ui.bit",
+    "sha256": "20d7f80062c7af4bad7a58bcabe632f6c9a2557ba69dd763bec212e0f3ed1145"
+  },
+  {
+    "path": "releases/multiboot/usb_points_20261029/fpga/image5_stable_ui.hex",
+    "sha256": "3bbdc6ee9e81dcad384c7d81f34edf7b4937433d7949f8540404307308f7dbdf"
+  },
+  {
+    "path": "releases/multiboot/usb_points_20261029/fpga/image7_usb_points.bit",
+    "sha256": "d4ddc552faaedc818af89a14f8c165d691779fa6bc89472ff9de22f9368b9b8e"
+  },
+  {
+    "path": "releases/multiboot/usb_points_20261029/fpga/image7_usb_points.hex",
+    "sha256": "a37598d7bc6ad7f894cab478696f287bc819cf98774f19acf2d44df3e2b55029"
+  },
+  {
+    "path": "releases/multiboot/usb_points_20261029/reports/flash_verify/slot0.hex",
+    "sha256": "2966dcd221e5fe2eb99e0dc85090d51b5c3df565408e4123908911459b151736"
+  },
+  {
+    "path": "releases/multiboot/usb_points_20261029/reports/flash_verify/slot1.hex",
+    "sha256": "4e78d8209d56529fb763481d68e4e29a40a43af76f6710a8e72c326e3c20ec41"
+  },
+  {
+    "path": "releases/multiboot/usb_points_20261029/reports/flash_verify/slot2.hex",
+    "sha256": "6f31d4f96f017361d733b7d04b279a36b1014bd168ad4109acef9972e03138da"
+  },
+  {
+    "path": "releases/multiboot/stable_ui_20261029/baseline/image7_confirmed_menu_v3.bit",
+    "sha256": "b7476606329cd0a11149d677061cb9ec2af10568147f659301c7bdd64ab0135d"
+  },
+  {
+    "path": "releases/multiboot/stable_ui_20261029/fpga/image1_load.bit",
+    "sha256": "8e39552c393cc4a165fa4b717d31e9226a35d0a8a4baac88d0806cad6cf55775"
+  },
+  {
+    "path": "releases/multiboot/stable_ui_20261029/fpga/image1_load.hex",
+    "sha256": "58635070fc1e20876a883055db17ae902c756e4a580ba891c05f3282c8018f29"
+  },
+  {
+    "path": "releases/multiboot/stable_ui_20261029/fpga/image5_stable_ui.bit",
+    "sha256": "20d7f80062c7af4bad7a58bcabe632f6c9a2557ba69dd763bec212e0f3ed1145"
+  },
+  {
+    "path": "releases/multiboot/stable_ui_20261029/fpga/image5_stable_ui.hex",
+    "sha256": "3bbdc6ee9e81dcad384c7d81f34edf7b4937433d7949f8540404307308f7dbdf"
+  },
+  {
+    "path": "releases/multiboot/stable_ui_20261029/fpga/image7_stable_ui.bit",
+    "sha256": "64b83983c26ae6f97e148edd1e3a58ebc844e7fce15680f4feab2c0abe5cecd2"
+  },
+  {
+    "path": "releases/multiboot/stable_ui_20261029/fpga/image7_stable_ui.hex",
+    "sha256": "aba18516bcc9602a19ce17be4f705e90b722d9903fb4855d6ddeb669315e1a48"
+  },
+  {
+    "path": "releases/multiboot/stable_ui_20261029/reports/flash_verify/slot0.hex",
+    "sha256": "b489248a87119dfda1107c3400f5d79a43722f0cc79540eb8d65009690fc68c9"
+  },
+  {
+    "path": "releases/multiboot/stable_ui_20261029/reports/flash_verify/slot1.hex",
+    "sha256": "4e78d8209d56529fb763481d68e4e29a40a43af76f6710a8e72c326e3c20ec41"
+  },
+  {
+    "path": "releases/multiboot/stable_ui_20261029/reports/flash_verify/slot2.hex",
+    "sha256": "6f31d4f96f017361d733b7d04b279a36b1014bd168ad4109acef9972e03138da"
+  },
+  {
+    "path": "releases/multiboot/image7_default_1_5.incomplete_20261029_0422/fpga/image1.bit",
+    "sha256": "8e39552c393cc4a165fa4b717d31e9226a35d0a8a4baac88d0806cad6cf55775"
+  },
+  {
+    "path": "releases/multiboot/image7_default_1_5.incomplete_20261029_0422/fpga/image1.hex",
+    "sha256": "58635070fc1e20876a883055db17ae902c756e4a580ba891c05f3282c8018f29"
+  },
+  {
+    "path": "releases/multiboot/image7_default_1_5.incomplete_20261029_0422/fpga/image5.bit",
+    "sha256": "e7de5aed758763b8739735b1ae81eb6eb4f2024c17d0b4f127d5f9fab50cad2e"
+  },
+  {
+    "path": "releases/multiboot/image7_default_1_5.incomplete_20261029_0422/fpga/image5.hex",
+    "sha256": "7427b8637532111466d3d155f8fb6a134d60306c6e5797c67ae89f73c325de18"
+  },
+  {
+    "path": "releases/multiboot/image7_default_1_5.incomplete_20261029_0422/fpga/image7.bit",
+    "sha256": "9711b9581426a4ae948286a88ea0eecfb0fa2cb67995fd2145f1dee0abef1c05"
+  },
+  {
+    "path": "releases/multiboot/image7_default_1_5.incomplete_20261029_0422/fpga/image7.hex",
+    "sha256": "6dd0515c81c15cc7d8cefd13f3f675dc4833020389761a88f3b83c1f46b4c534"
+  },
+  {
+    "path": "releases/multiboot/image7_default_1_5/fpga/image1.bit",
+    "sha256": "8e39552c393cc4a165fa4b717d31e9226a35d0a8a4baac88d0806cad6cf55775"
+  },
+  {
+    "path": "releases/multiboot/image7_default_1_5/fpga/image1.hex",
+    "sha256": "58635070fc1e20876a883055db17ae902c756e4a580ba891c05f3282c8018f29"
+  },
+  {
+    "path": "releases/multiboot/image7_default_1_5/fpga/image5.bit",
+    "sha256": "e7de5aed758763b8739735b1ae81eb6eb4f2024c17d0b4f127d5f9fab50cad2e"
+  },
+  {
+    "path": "releases/multiboot/image7_default_1_5/fpga/image5.hex",
+    "sha256": "7427b8637532111466d3d155f8fb6a134d60306c6e5797c67ae89f73c325de18"
+  },
+  {
+    "path": "releases/multiboot/image7_default_1_5/fpga/image7.bit",
+    "sha256": "9711b9581426a4ae948286a88ea0eecfb0fa2cb67995fd2145f1dee0abef1c05"
+  },
+  {
+    "path": "releases/multiboot/image7_default_1_5/fpga/image7.hex",
+    "sha256": "6dd0515c81c15cc7d8cefd13f3f675dc4833020389761a88f3b83c1f46b4c534"
+  },
+  {
+    "path": "releases/multiboot/image7_default_1_5/reports/flash_verify/slot0.hex",
+    "sha256": "64b3fc93eab1523cf89fc8450512a420c5513a4e2fe97bdd2d5a2f7a0cebca00"
+  },
+  {
+    "path": "releases/multiboot/image7_default_1_5/reports/flash_verify/slot1.hex",
+    "sha256": "4e78d8209d56529fb763481d68e4e29a40a43af76f6710a8e72c326e3c20ec41"
+  },
+  {
+    "path": "releases/multiboot/image7_default_1_5/reports/flash_verify/slot2.hex",
+    "sha256": "9caef80484ba87225b694bd265546fc0bfc60190a0229aa26effb30d6996f542"
+  },
+  {
+    "path": "releases/multiboot/image157_stable_ui_20261029/baseline/image7_confirmed_menu_v3.bit",
+    "sha256": "b7476606329cd0a11149d677061cb9ec2af10568147f659301c7bdd64ab0135d"
+  },
+  {
+    "path": "releases/multiboot/image157_stable_ui_20261029/fpga/image1_load.bit",
+    "sha256": "8e39552c393cc4a165fa4b717d31e9226a35d0a8a4baac88d0806cad6cf55775"
+  },
+  {
+    "path": "releases/multiboot/image157_stable_ui_20261029/fpga/image1_load.hex",
+    "sha256": "58635070fc1e20876a883055db17ae902c756e4a580ba891c05f3282c8018f29"
+  },
+  {
+    "path": "releases/multiboot/image157_stable_ui_20261029/fpga/image5_stable_ui.bit",
+    "sha256": "20d7f80062c7af4bad7a58bcabe632f6c9a2557ba69dd763bec212e0f3ed1145"
+  },
+  {
+    "path": "releases/multiboot/image157_stable_ui_20261029/fpga/image5_stable_ui.hex",
+    "sha256": "3bbdc6ee9e81dcad384c7d81f34edf7b4937433d7949f8540404307308f7dbdf"
+  },
+  {
+    "path": "releases/multiboot/image157_stable_ui_20261029/fpga/image7_stable_ui.bit",
+    "sha256": "64b83983c26ae6f97e148edd1e3a58ebc844e7fce15680f4feab2c0abe5cecd2"
+  },
+  {
+    "path": "releases/multiboot/image157_stable_ui_20261029/fpga/image7_stable_ui.hex",
+    "sha256": "aba18516bcc9602a19ce17be4f705e90b722d9903fb4855d6ddeb669315e1a48"
+  },
+  {
+    "path": "releases/multiboot/image157_stable_ui_20261029/reports/flash_verify/slot0.hex",
+    "sha256": "b489248a87119dfda1107c3400f5d79a43722f0cc79540eb8d65009690fc68c9"
+  },
+  {
+    "path": "releases/multiboot/image157_stable_ui_20261029/reports/flash_verify/slot1.hex",
+    "sha256": "4e78d8209d56529fb763481d68e4e29a40a43af76f6710a8e72c326e3c20ec41"
+  },
+  {
+    "path": "releases/multiboot/image157_stable_ui_20261029/reports/flash_verify/slot2.hex",
+    "sha256": "6f31d4f96f017361d733b7d04b279a36b1014bd168ad4109acef9972e03138da"
+  },
+  {
+    "path": "releases/multiboot/four_images_20261029/fpga/image1.bit",
+    "sha256": "6fcbdf421f88b2bdd5420cfa062695f53c0df4283f5a79f8a52dcc7061a54680"
+  },
+  {
+    "path": "releases/multiboot/four_images_20261029/fpga/image1.hex",
+    "sha256": "d906228f4f1d55c7104e6fc5625937af03cb860e007eedc1c1dd59fcd96977a0"
+  },
+  {
+    "path": "releases/multiboot/four_images_20261029/fpga/image2.bit",
+    "sha256": "a7684cdf6481263620adea9d93ef8033eb2023ff85b4c20d001c310300343b40"
+  },
+  {
+    "path": "releases/multiboot/four_images_20261029/fpga/image2.hex",
+    "sha256": "ef174cef9f28a9e80028f7a4a64f9083df3a5e574654001893866c755ec3774f"
+  },
+  {
+    "path": "releases/multiboot/four_images_20261029/fpga/image5.bit",
+    "sha256": "064636d7fd1bb4e5d65153bcf1a361700d9d9e0843b042cfa280cbe7ce65f0bc"
+  },
+  {
+    "path": "releases/multiboot/four_images_20261029/fpga/image5.hex",
+    "sha256": "554e5e4e7c1df267c23bc6598abb2235ab058fcf53378893f49e39fd3b298894"
+  },
+  {
+    "path": "releases/multiboot/four_images_20261029/fpga/image7.bit",
+    "sha256": "f1c658d245ce16f34c054093f23a6a82320beeae1991c09e003a96b57471a9f0"
+  },
+  {
+    "path": "releases/multiboot/four_images_20261029/fpga/image7.hex",
+    "sha256": "047007b80aa38a141da58e03d451deb7aa0dd3e0d23d12109ab55ced381fc40c"
+  },
+  {
+    "path": "releases/multiboot/four_images_20261029/reports/flash_verify/slot0.hex",
+    "sha256": "77b972afb1228e09f75578df762ced71846367788e86dbded70f09e1a6f62637"
+  },
+  {
+    "path": "releases/multiboot/four_images_20261029/reports/flash_verify/slot1.hex",
+    "sha256": "5381a9a06867398183e8cd8970b1faffd579b30bc8cda3c7ca74cd184d8c5f5f"
+  },
+  {
+    "path": "releases/multiboot/four_images_20261029/reports/flash_verify/slot2.hex",
+    "sha256": "93f44ad2908a9d37173dcc7caa4b21a3c72ba3fcf280bce3a5da5f28e18d4b19"
+  },
+  {
+    "path": "releases/multiboot/four_images_20261029/reports/flash_verify/slot3.hex",
+    "sha256": "44839f40a6fba70282524577ee36325251b71864ab8ea0b8a40df0a521dd4074"
+  },
+  {
+    "path": "releases/image7/performance_v1/FLASH_IMAGE7_PERF_1_5.hex",
+    "sha256": "c131f3badce94bcd9246b027f4e34930b1e08926d037eea465b2f8dad6e834d2"
+  },
+  {
+    "path": "releases/image7/performance_v2_latest/FLASH_IMAGE7_LATEST_1_5.hex",
+    "sha256": "3f589fc1a98c98831b6c1ad883d1e94e259a730816232cb541cdbfc38df6e523"
+  },
+  {
+    "path": "releases/image7/video_guard_v2/fpga/image7_mocap11_a.bit",
+    "sha256": "d5656cf07aa8bf09583f5f84ccbd006f38e8f8a47ad43b2457d4cbfe548bf8af"
+  },
+  {
+    "path": "releases/image7/standalone/fpga/image7_mocap11_a.bit",
+    "sha256": "060c2a65f7ee75fd361c6b644ce92aeced678efcbc65234084cc990c634f785a"
+  },
+  {
+    "path": "releases/image7/performance_v2_latest/baseline/FLASH_V1.hex",
+    "sha256": "c131f3badce94bcd9246b027f4e34930b1e08926d037eea465b2f8dad6e834d2"
+  },
+  {
+    "path": "releases/image7/performance_v2_latest/baseline/image7_v1.bit",
+    "sha256": "8aa373f03c728111674ae57daa11d25bff7d9a8182ef154561228c846be5d427"
+  },
+  {
+    "path": "releases/image7/performance_v2_latest/baseline/image7_v1.hex",
+    "sha256": "1da07a7fd9141d97443944cf2718be3a46cc6981dcfd56e0ddcbdbe58b70d1ee"
+  },
+  {
+    "path": "releases/image7/performance_v2_latest/fpga/image1.hex",
+    "sha256": "58635070fc1e20876a883055db17ae902c756e4a580ba891c05f3282c8018f29"
+  },
+  {
+    "path": "releases/image7/performance_v2_latest/fpga/image5.hex",
+    "sha256": "7427b8637532111466d3d155f8fb6a134d60306c6e5797c67ae89f73c325de18"
+  },
+  {
+    "path": "releases/image7/performance_v2_latest/fpga/image7_latest_a.bit",
+    "sha256": "f013fe5c24a56560b14f89bc14100705222d0fbcb5fcb965ff09fc74b6c08f46"
+  },
+  {
+    "path": "releases/image7/performance_v2_latest/fpga/image7_latest_a.hex",
+    "sha256": "bc9eb61462db6c2ddb8e671b3a2ff87ef6f27d8f4fc50aeebdd34217cc9fcef6"
+  },
+  {
+    "path": "releases/image7/performance_v2_latest/reports/flash_verify/slot0.hex",
+    "sha256": "1d6d05889312aa52501492c63e7bce2a8642f775c12784da91fc912cec5e6c32"
+  },
+  {
+    "path": "releases/image7/performance_v2_latest/reports/flash_verify/slot1.hex",
+    "sha256": "4e78d8209d56529fb763481d68e4e29a40a43af76f6710a8e72c326e3c20ec41"
+  },
+  {
+    "path": "releases/image7/performance_v2_latest/reports/flash_verify/slot2.hex",
+    "sha256": "9caef80484ba87225b694bd265546fc0bfc60190a0229aa26effb30d6996f542"
+  },
+  {
+    "path": "releases/image7/performance_v1/baseline/FLASH_BEFORE.hex",
+    "sha256": "c5bb51dc5aca2030bee150449c3d04d13390d8b74114dfd5633bd4a40e9efe0c"
+  },
+  {
+    "path": "releases/image7/performance_v1/baseline/image7_before.bit",
+    "sha256": "9711b9581426a4ae948286a88ea0eecfb0fa2cb67995fd2145f1dee0abef1c05"
+  },
+  {
+    "path": "releases/image7/performance_v1/baseline/image7_before.hex",
+    "sha256": "6dd0515c81c15cc7d8cefd13f3f675dc4833020389761a88f3b83c1f46b4c534"
+  },
+  {
+    "path": "releases/image7/performance_v1/fpga/image1.hex",
+    "sha256": "58635070fc1e20876a883055db17ae902c756e4a580ba891c05f3282c8018f29"
+  },
+  {
+    "path": "releases/image7/performance_v1/fpga/image5.hex",
+    "sha256": "7427b8637532111466d3d155f8fb6a134d60306c6e5797c67ae89f73c325de18"
+  },
+  {
+    "path": "releases/image7/performance_v1/fpga/image7_perf_a.bit",
+    "sha256": "8aa373f03c728111674ae57daa11d25bff7d9a8182ef154561228c846be5d427"
+  },
+  {
+    "path": "releases/image7/performance_v1/fpga/image7_perf_a.hex",
+    "sha256": "1da07a7fd9141d97443944cf2718be3a46cc6981dcfd56e0ddcbdbe58b70d1ee"
+  },
+  {
+    "path": "releases/image7/performance_v1/reports/flash_verify/slot0.hex",
+    "sha256": "6660ae0f0a889b59f5e0047aba2a59ae605d626c321b1a498e941fc83d4e3f02"
+  },
+  {
+    "path": "releases/image7/performance_v1/reports/flash_verify/slot1.hex",
+    "sha256": "4e78d8209d56529fb763481d68e4e29a40a43af76f6710a8e72c326e3c20ec41"
+  },
+  {
+    "path": "releases/image7/performance_v1/reports/flash_verify/slot2.hex",
+    "sha256": "9caef80484ba87225b694bd265546fc0bfc60190a0229aa26effb30d6996f542"
+  },
+  {
+    "path": "releases/image7/menu_v3/fpga/image7_mocap11_a.bit",
+    "sha256": "b7476606329cd0a11149d677061cb9ec2af10568147f659301c7bdd64ab0135d"
+  },
+  {
+    "path": "releases/image6/standalone/fpga/image6_sd_hdmi.bit",
+    "sha256": "a79499d8409fd2cc42b75adb49983ea4a0c2a86ff71884a42ca0df19673235e2"
+  },
+  {
+    "path": "releases/image2/video_guard_20261029/fpga/image2_video_guard.bit",
+    "sha256": "995cac1f24f3e40701070bed28d05b12ef56e2650a3349418e042ca815995e8a"
+  },
+  {
+    "path": "releases/image2/video_guard_20261029/fpga/image2_video_guard.hex",
+    "sha256": "c5941340cc79e6fe72e79108e6bd37b4fc5aa87ad17f9f95c1c97cd5254ba03c"
+  },
+  {
+    "path": "releases/image2/p4_menu_20261029/fpga/image2_p4_menu.bit",
+    "sha256": "1ed86a169009b134441cffcb7b00fd64cd7c0190c14f4baefeec108330e341bc"
+  },
+  {
+    "path": "releases/image2/p4_menu_20261029/fpga/image2_p4_menu.hex",
+    "sha256": "5542e4f44826e3976ba19283d0e96bd1b457670bf0c52a670cf945d8e9555eca"
+  }
+]

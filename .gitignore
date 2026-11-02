@@ -1,0 +1,28 @@
+# ============================================================
+# FinalEfinityFour - repository ignore rules
+# ============================================================
+
+# PC 端便携运行时（PyInstaller 冻结包，3.3 GB，含 12 个 >100 MB 的
+# CUDA/torch DLL，GitHub 单文件硬上限 100 MB，无法入库）
+finalGamePC/
+
+# Efinity 构建中间产物（可重新综合生成）
+outflow/
+*.sdb
+*.log
+*.troutingtraces
+*.netlist
+*.clstmap
+*.lbf
+*.vdb
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+
+# 系统杂项
+Thumbs.db
+desktop.ini
+.DS_Store

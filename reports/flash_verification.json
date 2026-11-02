@@ -1,0 +1,81 @@
+{
+  "mode": "selectable_flash_image",
+  "type": "internal",
+  "default_image": 7,
+  "flash_capacity_bytes": 8388608,
+  "programmed_bytes": 7761530,
+  "combined_sha256": "93e0a7c34ec4980451ef8acd6eef0cb33ee50b2c58e800d509464ff181bde30a",
+  "all_four_cram_payloads_preserved": true,
+  "every_slot_has_internal_reconfiguration_and_same_address_table": true,
+  "slots": [
+    {
+      "image": 7,
+      "slot": 0,
+      "address": 0,
+      "length": 1037520,
+      "file": "E:\\Efinity_Project\\EfinityFPGAfour\\releases\\multiboot\\four_images_image1_guard_20261029\\fpga\\image7.hex",
+      "source_sha256": "047007b80aa38a141da58e03d451deb7aa0dd3e0d23d12109ab55ced381fc40c",
+      "options": {
+        "EN_CB": 0,
+        "EN_RUPD": 1,
+        "CB_ADDR_1": 2621440,
+        "CB_ADDR_2": 5242880,
+        "CB_ADDR_3": 6815744
+      },
+      "changed_option_bits": 7,
+      "payload_preserved": true
+    },
+    {
+      "image": 1,
+      "slot": 1,
+      "address": 2621440,
+      "length": 1006738,
+      "file": "E:\\Efinity_Project\\EfinityFPGAfour\\releases\\multiboot\\four_images_image1_guard_20261029\\fpga\\image1.hex",
+      "source_sha256": "596da6015fe766390af364cd7151e6fe7bcb255f940472ce9647badeffacfce8",
+      "options": {
+        "EN_CB": 0,
+        "EN_RUPD": 1,
+        "CB_ADDR_1": 2621440,
+        "CB_ADDR_2": 5242880,
+        "CB_ADDR_3": 6815744
+      },
+      "changed_option_bits": 7,
+      "payload_preserved": true
+    },
+    {
+      "image": 5,
+      "slot": 2,
+      "address": 5242880,
+      "length": 803268,
+      "file": "E:\\Efinity_Project\\EfinityFPGAfour\\releases\\multiboot\\four_images_image1_guard_20261029\\fpga\\image5.hex",
+      "source_sha256": "554e5e4e7c1df267c23bc6598abb2235ab058fcf53378893f49e39fd3b298894",
+      "options": {
+        "EN_CB": 0,
+        "EN_RUPD": 1,
+        "CB_ADDR_1": 2621440,
+        "CB_ADDR_2": 5242880,
+        "CB_ADDR_3": 6815744
+      },
+      "changed_option_bits": 7,
+      "payload_preserved": true
+    },
+    {
+      "image": 2,
+      "slot": 3,
+      "address": 6815744,
+      "length": 945786,
+      "file": "E:\\Efinity_Project\\EfinityFPGAfour\\releases\\multiboot\\four_images_image1_guard_20261029\\fpga\\image2.hex",
+      "source_sha256": "ef174cef9f28a9e80028f7a4a64f9083df3a5e574654001893866c755ec3774f",
+      "options": {
+        "EN_CB": 0,
+        "EN_RUPD": 1,
+        "CB_ADDR_1": 2621440,
+        "CB_ADDR_2": 5242880,
+        "CB_ADDR_3": 6815744
+      },
+      "changed_option_bits": 7,
+      "payload_preserved": true
+    }
+  ],
+  "hardware_tested": false
+}

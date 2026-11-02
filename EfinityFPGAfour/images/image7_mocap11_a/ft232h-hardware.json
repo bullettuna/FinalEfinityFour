@@ -1,0 +1,670 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-24",
+  "scope": "Hardware-only handoff; no FPGA project selected; software and real-board operation not verified",
+  "board": "SZOVS VF-Ti60F225 + custom FPGA expansion + separate complete FT232H module adapter",
+  "fpga_device": "Ti60F225",
+  "signals": [
+    {
+      "signal": "spi_sclk",
+      "connector": "P4",
+      "pin": "13",
+      "resource": "GPIOL_N_12",
+      "ball": "G4",
+      "fpga_voltage": "1.8V",
+      "old_P3": "",
+      "P4_User_IO": "10",
+      "external_level": "3.3V",
+      "module_function": "",
+      "direction_from_fpga": "output",
+      "io_standard": "1.8 V LVCMOS",
+      "evidence": "2026-10-18 final PCB pin export + VF-Ti60F225 HDK V2.2 schematics",
+      "active": true
+    },
+    {
+      "signal": "spi_mosi",
+      "connector": "P4",
+      "pin": "14",
+      "resource": "GPIOL_P_12",
+      "ball": "G3",
+      "fpga_voltage": "1.8V",
+      "old_P3": "",
+      "P4_User_IO": "11",
+      "external_level": "3.3V",
+      "module_function": "",
+      "direction_from_fpga": "output",
+      "io_standard": "1.8 V LVCMOS",
+      "evidence": "2026-10-18 final PCB pin export + VF-Ti60F225 HDK V2.2 schematics",
+      "active": true
+    },
+    {
+      "signal": "spi_miso",
+      "connector": "P4",
+      "pin": "17",
+      "resource": "GPIOL_N_10",
+      "ball": "G2",
+      "fpga_voltage": "1.8V",
+      "old_P3": "",
+      "P4_User_IO": "14",
+      "external_level": "3.3V",
+      "module_function": "",
+      "direction_from_fpga": "input",
+      "io_standard": "1.8 V LVCMOS",
+      "evidence": "2026-10-18 final PCB pin export + VF-Ti60F225 HDK V2.2 schematics",
+      "active": true
+    },
+    {
+      "signal": "cs_adc",
+      "connector": "P4",
+      "pin": "18",
+      "resource": "GPIOL_P_10",
+      "ball": "H2",
+      "fpga_voltage": "1.8V",
+      "old_P3": "",
+      "P4_User_IO": "15",
+      "external_level": "3.3V",
+      "module_function": "",
+      "direction_from_fpga": "output",
+      "io_standard": "1.8 V LVCMOS",
+      "evidence": "2026-10-18 final PCB pin export + VF-Ti60F225 HDK V2.2 schematics",
+      "active": true
+    },
+    {
+      "signal": "cs_oled",
+      "connector": "P4",
+      "pin": "19",
+      "resource": "GPIOL_N_11",
+      "ball": "F5",
+      "fpga_voltage": "1.8V",
+      "old_P3": "",
+      "P4_User_IO": "16",
+      "external_level": "3.3V",
+      "module_function": "",
+      "direction_from_fpga": "output",
+      "io_standard": "1.8 V LVCMOS",
+      "evidence": "2026-10-18 final PCB pin export + VF-Ti60F225 HDK V2.2 schematics",
+      "active": true
+    },
+    {
+      "signal": "oled_dc",
+      "connector": "P4",
+      "pin": "20",
+      "resource": "GPIOL_P_11",
+      "ball": "G5",
+      "fpga_voltage": "1.8V",
+      "old_P3": "",
+      "P4_User_IO": "17",
+      "external_level": "3.3V",
+      "module_function": "",
+      "direction_from_fpga": "output",
+      "io_standard": "1.8 V LVCMOS",
+      "evidence": "2026-10-18 final PCB pin export + VF-Ti60F225 HDK V2.2 schematics",
+      "active": true
+    },
+    {
+      "signal": "sd_clk",
+      "connector": "P4",
+      "pin": "27",
+      "resource": "GPIOL_N_14",
+      "ball": "F2",
+      "fpga_voltage": "1.8V",
+      "old_P3": "",
+      "P4_User_IO": "24",
+      "external_level": "3.3V",
+      "module_function": "",
+      "direction_from_fpga": "output",
+      "io_standard": "1.8 V LVCMOS",
+      "evidence": "2026-10-18 final PCB pin export + VF-Ti60F225 HDK V2.2 schematics",
+      "active": true
+    },
+    {
+      "signal": "sd_cmd_io",
+      "connector": "P4",
+      "pin": "28",
+      "resource": "GPIOL_P_14",
+      "ball": "F1",
+      "fpga_voltage": "1.8V",
+      "old_P3": "",
+      "P4_User_IO": "25",
+      "external_level": "3.3V",
+      "module_function": "",
+      "direction_from_fpga": "inout",
+      "io_standard": "1.8 V LVCMOS",
+      "evidence": "2026-10-18 final PCB pin export + VF-Ti60F225 HDK V2.2 schematics",
+      "active": true
+    },
+    {
+      "signal": "sd_dat[0]",
+      "connector": "P4",
+      "pin": "33",
+      "resource": "GPIOL_N_16",
+      "ball": "C1",
+      "fpga_voltage": "1.8V",
+      "old_P3": "",
+      "P4_User_IO": "28",
+      "external_level": "3.3V",
+      "module_function": "",
+      "direction_from_fpga": "inout",
+      "io_standard": "1.8 V LVCMOS",
+      "evidence": "2026-10-18 final PCB pin export + VF-Ti60F225 HDK V2.2 schematics",
+      "active": true
+    },
+    {
+      "signal": "sd_dat[1]",
+      "connector": "P4",
+      "pin": "34",
+      "resource": "GPIOL_P_16",
+      "ball": "D1",
+      "fpga_voltage": "1.8V",
+      "old_P3": "",
+      "P4_User_IO": "29",
+      "external_level": "3.3V",
+      "module_function": "",
+      "direction_from_fpga": "inout",
+      "io_standard": "1.8 V LVCMOS",
+      "evidence": "2026-10-18 final PCB pin export + VF-Ti60F225 HDK V2.2 schematics",
+      "active": true
+    },
+    {
+      "signal": "sd_dat[2]",
+      "connector": "P4",
+      "pin": "25",
+      "resource": "GPIOL_N_09",
+      "ball": "G1",
+      "fpga_voltage": "1.8V",
+      "old_P3": "",
+      "P4_User_IO": "22",
+      "external_level": "3.3V",
+      "module_function": "",
+      "direction_from_fpga": "inout",
+      "io_standard": "1.8 V LVCMOS",
+      "evidence": "2026-10-18 final PCB pin export + VF-Ti60F225 HDK V2.2 schematics",
+      "active": true
+    },
+    {
+      "signal": "sd_dat[3]",
+      "connector": "P4",
+      "pin": "26",
+      "resource": "GPIOL_P_09",
+      "ball": "H1",
+      "fpga_voltage": "1.8V",
+      "old_P3": "",
+      "P4_User_IO": "23",
+      "external_level": "3.3V",
+      "module_function": "",
+      "direction_from_fpga": "inout",
+      "io_standard": "1.8 V LVCMOS",
+      "evidence": "2026-10-18 final PCB pin export + VF-Ti60F225 HDK V2.2 schematics",
+      "active": true
+    },
+    {
+      "signal": "key",
+      "connector": "P4",
+      "pin": "37",
+      "resource": "GPIOL_N_18",
+      "ball": "A2",
+      "fpga_voltage": "1.8V",
+      "old_P3": "",
+      "P4_User_IO": "32",
+      "external_level": "3.3V",
+      "module_function": "",
+      "direction_from_fpga": "input",
+      "io_standard": "1.8 V LVCMOS",
+      "evidence": "2026-10-18 final PCB pin export + VF-Ti60F225 HDK V2.2 schematics",
+      "active": true
+    },
+    {
+      "signal": "ft_d0",
+      "connector": "P3",
+      "pin": "3",
+      "resource": "GPIOL_09",
+      "ball": "A4",
+      "fpga_voltage": "3.3V",
+      "old_P3": "",
+      "P4_User_IO": "",
+      "external_level": "3.3V",
+      "module_function": "AD0 / D0",
+      "direction_from_fpga": "inout",
+      "io_standard": "3.3 V LVCMOS",
+      "evidence": "2026-10-18 final PCB pin export + VF-Ti60F225 HDK V2.2 schematics",
+      "active": true
+    },
+    {
+      "signal": "ft_d1",
+      "connector": "P3",
+      "pin": "5",
+      "resource": "GPIOL_03",
+      "ball": "A3",
+      "fpga_voltage": "3.3V",
+      "old_P3": "",
+      "P4_User_IO": "",
+      "external_level": "3.3V",
+      "module_function": "AD1 / D1",
+      "direction_from_fpga": "inout",
+      "io_standard": "3.3 V LVCMOS",
+      "evidence": "2026-10-18 final PCB pin export + VF-Ti60F225 HDK V2.2 schematics",
+      "active": true
+    },
+    {
+      "signal": "ft_d2",
+      "connector": "P3",
+      "pin": "10",
+      "resource": "GPIOL_07",
+      "ball": "C4",
+      "fpga_voltage": "3.3V",
+      "old_P3": "",
+      "P4_User_IO": "",
+      "external_level": "3.3V",
+      "module_function": "AD2 / D2",
+      "direction_from_fpga": "inout",
+      "io_standard": "3.3 V LVCMOS",
+      "evidence": "2026-10-18 final PCB pin export + VF-Ti60F225 HDK V2.2 schematics",
+      "active": true
+    },
+    {
+      "signal": "ft_d3",
+      "connector": "P3",
+      "pin": "12",
+      "resource": "GPIOL_10",
+      "ball": "B5",
+      "fpga_voltage": "3.3V",
+      "old_P3": "",
+      "P4_User_IO": "",
+      "external_level": "3.3V",
+      "module_function": "AD3 / D3",
+      "direction_from_fpga": "inout",
+      "io_standard": "3.3 V LVCMOS",
+      "evidence": "2026-10-18 final PCB pin export + VF-Ti60F225 HDK V2.2 schematics",
+      "active": true
+    },
+    {
+      "signal": "ft_d4",
+      "connector": "P3",
+      "pin": "11",
+      "resource": "GPIOR_18",
+      "ball": "B14",
+      "fpga_voltage": "3.3V",
+      "old_P3": "",
+      "P4_User_IO": "",
+      "external_level": "3.3V",
+      "module_function": "AD4 / D4",
+      "direction_from_fpga": "inout",
+      "io_standard": "3.3 V LVCMOS",
+      "evidence": "2026-10-18 final PCB pin export + VF-Ti60F225 HDK V2.2 schematics",
+      "active": true
+    },
+    {
+      "signal": "ft_d5",
+      "connector": "P3",
+      "pin": "13",
+      "resource": "GPIOR_19",
+      "ball": "A14",
+      "fpga_voltage": "3.3V",
+      "old_P3": "",
+      "P4_User_IO": "",
+      "external_level": "3.3V",
+      "module_function": "AD5 / D5",
+      "direction_from_fpga": "inout",
+      "io_standard": "3.3 V LVCMOS",
+      "evidence": "2026-10-18 final PCB pin export + VF-Ti60F225 HDK V2.2 schematics",
+      "active": true
+    },
+    {
+      "signal": "ft_d6",
+      "connector": "P3",
+      "pin": "6",
+      "resource": "GPIOR_20",
+      "ball": "D12",
+      "fpga_voltage": "3.3V",
+      "old_P3": "",
+      "P4_User_IO": "",
+      "external_level": "3.3V",
+      "module_function": "AD6 / D6",
+      "direction_from_fpga": "inout",
+      "io_standard": "3.3 V LVCMOS",
+      "evidence": "2026-10-18 final PCB pin export + VF-Ti60F225 HDK V2.2 schematics",
+      "active": true
+    },
+    {
+      "signal": "ft_d7",
+      "connector": "P3",
+      "pin": "4",
+      "resource": "GPIOR_13",
+      "ball": "A12",
+      "fpga_voltage": "3.3V",
+      "old_P3": "",
+      "P4_User_IO": "",
+      "external_level": "3.3V",
+      "module_function": "AD7 / D7",
+      "direction_from_fpga": "inout",
+      "io_standard": "3.3 V LVCMOS",
+      "evidence": "2026-10-18 final PCB pin export + VF-Ti60F225 HDK V2.2 schematics",
+      "active": true
+    },
+    {
+      "signal": "ft_wr_n",
+      "connector": "P3",
+      "pin": "14",
+      "resource": "GPIOL_06",
+      "ball": "C3",
+      "fpga_voltage": "3.3V",
+      "old_P3": "",
+      "P4_User_IO": "",
+      "external_level": "3.3V",
+      "module_function": "AC3 / WR#",
+      "direction_from_fpga": "output",
+      "io_standard": "3.3 V LVCMOS",
+      "evidence": "2026-10-18 final PCB pin export + VF-Ti60F225 HDK V2.2 schematics",
+      "active": true
+    },
+    {
+      "signal": "ft_txe_n",
+      "connector": "P3",
+      "pin": "9",
+      "resource": "GPIOR_12",
+      "ball": "A13",
+      "fpga_voltage": "3.3V",
+      "old_P3": "",
+      "P4_User_IO": "",
+      "external_level": "3.3V",
+      "module_function": "AC1 / TXE#",
+      "direction_from_fpga": "input",
+      "io_standard": "3.3 V LVCMOS",
+      "evidence": "2026-10-18 final PCB pin export + VF-Ti60F225 HDK V2.2 schematics",
+      "active": true
+    },
+    {
+      "signal": "ft_clk_60m",
+      "connector": "P3",
+      "pin": "7",
+      "resource": "GPIOT_P_07",
+      "ball": "B8",
+      "fpga_voltage": "1.8V after divider",
+      "old_P3": "",
+      "P4_User_IO": "",
+      "external_level": "FT AC5=3.3V; expansion buffer nominal 2.343V -> P3.7 -> baseboard divider nominal 1.750V at B8",
+      "module_function": "AC5 / CLKOUT，经扩展板缓冲",
+      "direction_from_fpga": "input_clock",
+      "io_standard": "1.8 V LVCMOS",
+      "evidence": "2026-10-18 final PCB pin export + VF-Ti60F225 HDK V2.2 schematics",
+      "active": false
+    }
+  ],
+  "idc": [
+    {
+      "pin": 1,
+      "net": "GND",
+      "ft_adapter": "U1.1",
+      "fpga_expansion": "U9.1",
+      "cable": "1-to-1; verify cable pin numbering, not visible side orientation"
+    },
+    {
+      "pin": 2,
+      "net": "AD0",
+      "ft_adapter": "U1.2",
+      "fpga_expansion": "U9.2",
+      "cable": "1-to-1; verify cable pin numbering, not visible side orientation"
+    },
+    {
+      "pin": 3,
+      "net": "GND",
+      "ft_adapter": "U1.3",
+      "fpga_expansion": "U9.3",
+      "cable": "1-to-1; verify cable pin numbering, not visible side orientation"
+    },
+    {
+      "pin": 4,
+      "net": "AD1",
+      "ft_adapter": "U1.4",
+      "fpga_expansion": "U9.4",
+      "cable": "1-to-1; verify cable pin numbering, not visible side orientation"
+    },
+    {
+      "pin": 5,
+      "net": "GND",
+      "ft_adapter": "U1.5",
+      "fpga_expansion": "U9.5",
+      "cable": "1-to-1; verify cable pin numbering, not visible side orientation"
+    },
+    {
+      "pin": 6,
+      "net": "AD7",
+      "ft_adapter": "U1.6",
+      "fpga_expansion": "U9.6",
+      "cable": "1-to-1; verify cable pin numbering, not visible side orientation"
+    },
+    {
+      "pin": 7,
+      "net": "GND",
+      "ft_adapter": "U1.7",
+      "fpga_expansion": "U9.7",
+      "cable": "1-to-1; verify cable pin numbering, not visible side orientation"
+    },
+    {
+      "pin": 8,
+      "net": "AD6",
+      "ft_adapter": "U1.8",
+      "fpga_expansion": "U9.8",
+      "cable": "1-to-1; verify cable pin numbering, not visible side orientation"
+    },
+    {
+      "pin": 9,
+      "net": "GND",
+      "ft_adapter": "U1.9",
+      "fpga_expansion": "U9.9",
+      "cable": "1-to-1; verify cable pin numbering, not visible side orientation"
+    },
+    {
+      "pin": 10,
+      "net": "FT_CLK_RAW",
+      "ft_adapter": "U1.10",
+      "fpga_expansion": "U9.10",
+      "cable": "1-to-1; verify cable pin numbering, not visible side orientation"
+    },
+    {
+      "pin": 11,
+      "net": "GND",
+      "ft_adapter": "U1.11",
+      "fpga_expansion": "U9.11",
+      "cable": "1-to-1; verify cable pin numbering, not visible side orientation"
+    },
+    {
+      "pin": 12,
+      "net": "AC1",
+      "ft_adapter": "U1.12",
+      "fpga_expansion": "U9.12",
+      "cable": "1-to-1; verify cable pin numbering, not visible side orientation"
+    },
+    {
+      "pin": 13,
+      "net": "GND",
+      "ft_adapter": "U1.13",
+      "fpga_expansion": "U9.13",
+      "cable": "1-to-1; verify cable pin numbering, not visible side orientation"
+    },
+    {
+      "pin": 14,
+      "net": "AD2",
+      "ft_adapter": "U1.14",
+      "fpga_expansion": "U9.14",
+      "cable": "1-to-1; verify cable pin numbering, not visible side orientation"
+    },
+    {
+      "pin": 15,
+      "net": "GND",
+      "ft_adapter": "U1.15",
+      "fpga_expansion": "U9.15",
+      "cable": "1-to-1; verify cable pin numbering, not visible side orientation"
+    },
+    {
+      "pin": 16,
+      "net": "AD4",
+      "ft_adapter": "U1.16",
+      "fpga_expansion": "U9.16",
+      "cable": "1-to-1; verify cable pin numbering, not visible side orientation"
+    },
+    {
+      "pin": 17,
+      "net": "GND",
+      "ft_adapter": "U1.17",
+      "fpga_expansion": "U9.17",
+      "cable": "1-to-1; verify cable pin numbering, not visible side orientation"
+    },
+    {
+      "pin": 18,
+      "net": "AD3",
+      "ft_adapter": "U1.18",
+      "fpga_expansion": "U9.18",
+      "cable": "1-to-1; verify cable pin numbering, not visible side orientation"
+    },
+    {
+      "pin": 19,
+      "net": "GND",
+      "ft_adapter": "U1.19",
+      "fpga_expansion": "U9.19",
+      "cable": "1-to-1; verify cable pin numbering, not visible side orientation"
+    },
+    {
+      "pin": 20,
+      "net": "AD5",
+      "ft_adapter": "U1.20",
+      "fpga_expansion": "U9.20",
+      "cable": "1-to-1; verify cable pin numbering, not visible side orientation"
+    },
+    {
+      "pin": 21,
+      "net": "GND",
+      "ft_adapter": "U1.21",
+      "fpga_expansion": "U9.21",
+      "cable": "1-to-1; verify cable pin numbering, not visible side orientation"
+    },
+    {
+      "pin": 22,
+      "net": "AC3",
+      "ft_adapter": "U1.22",
+      "fpga_expansion": "U9.22",
+      "cable": "1-to-1; verify cable pin numbering, not visible side orientation"
+    },
+    {
+      "pin": 23,
+      "net": "GND",
+      "ft_adapter": "U1.23",
+      "fpga_expansion": "U9.23",
+      "cable": "1-to-1; verify cable pin numbering, not visible side orientation"
+    },
+    {
+      "pin": 24,
+      "net": "GND",
+      "ft_adapter": "U1.24",
+      "fpga_expansion": "U9.24",
+      "cable": "1-to-1; verify cable pin numbering, not visible side orientation"
+    },
+    {
+      "pin": 25,
+      "net": "GND",
+      "ft_adapter": "U1.25",
+      "fpga_expansion": "U9.25",
+      "cable": "1-to-1; verify cable pin numbering, not visible side orientation"
+    },
+    {
+      "pin": 26,
+      "net": "GND",
+      "ft_adapter": "U1.26",
+      "fpga_expansion": "U9.26",
+      "cable": "1-to-1; verify cable pin numbering, not visible side orientation"
+    }
+  ],
+  "power": {
+    "expansion_vcc": "P4.29 / D3V3; nominal 3.3V",
+    "grounds": [
+      "P3.2",
+      "P4.12",
+      "P4.30",
+      "26P GND pins",
+      "FT232H module GND"
+    ],
+    "ft_module_supply": "PC USB; FT_VIO used only for local adapter pull-ups; VCORE isolated",
+    "clock_buffer": "SN74AUC1G125DBVR",
+    "clock_ldo": "TLV75801PDBVR",
+    "clock_ldo_nominal_v": 2.343,
+    "baseboard_measured_divider_ohms": [
+      67.5,
+      199
+    ],
+    "fpga_clock_high_ideal_v": 1.7495572232645404
+  },
+  "ft232h": {
+    "mode": "FT245 synchronous FIFO",
+    "direction": "FPGA to PC only with assembled wiring",
+    "eeprom": "FT245 FIFO configuration required before FT_SetBitMode(...,0x40)",
+    "idle_controls": {
+      "AC2_RD_n": "10k pull-up to FT_VIO",
+      "AC4_SIWU_n": "10k pull-up to FT_VIO",
+      "AC6_OE_n": "10k pull-up to FT_VIO",
+      "AC7_PWRSAV_n": "10k pull-up to FT_VIO"
+    },
+    "clock_hz": 60000000,
+    "verified_clock_and_timing": false
+  },
+  "adc": {
+    "chip": "MCP3202-CI/SN",
+    "supply_v": 3.3,
+    "resolution_bits": 12,
+    "spi_mode": 0,
+    "initial_spi_hz": 500000,
+    "channel_sample_hz": 1000,
+    "command_ch0_hex": "01 A0 00",
+    "command_ch1_hex": "01 E0 00",
+    "ch0": "potentiometer",
+    "ch1": "resistor-coded SW2/SW3 buttons",
+    "resistors_ohms": {
+      "CH1_pullup": 10000,
+      "SW2_pulldown": 10000,
+      "SW3_pulldown": 3300
+    },
+    "key_windows_proposed": {
+      "release": [
+        3900,
+        4095
+      ],
+      "SW2": [
+        1900,
+        2200
+      ],
+      "SW3": [
+        940,
+        1100
+      ],
+      "both": [
+        740,
+        890
+      ]
+    },
+    "windows_measured": false
+  },
+  "gpio_key": {
+    "pin": "P4.37",
+    "active_level": 0,
+    "debounce_ms": 20
+  },
+  "sd": {
+    "mode": "SD native 4-bit, not SPI",
+    "initial_clock_hz": 400000,
+    "initial_run_clock_hz": 6000000,
+    "dat2": "P4.25 / GPIOL_N_09 / G1",
+    "dat3": "P4.26 / GPIOL_P_09 / H1",
+    "physical_read_write_verified": false
+  },
+  "cable_lengths": {
+    "ft_idc_recommended_cm": [
+      3,
+      5
+    ],
+    "p4_initial_recommended_cm": [
+      5,
+      10
+    ],
+    "note": "Engineering starting points, not guaranteed protocol maximum lengths"
+  },
+  "transport": "FT245_ASYNC_FIFO"
+}

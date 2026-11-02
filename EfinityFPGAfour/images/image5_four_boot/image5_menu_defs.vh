@@ -1,0 +1,46 @@
+`ifndef IMAGE5_MENU_DEFS_VH
+`define IMAGE5_MENU_DEFS_VH
+`define M5_VIEW 5'd0
+`define M5_MEDIAN 5'd1
+`define M5_CLEANUP 5'd2
+`define M5_FREEZE 5'd3
+`define M5_TEST 5'd4
+`define M5_CANNY 5'd5
+`define M5_CANNY_H 5'd6
+`define M5_CANNY_L 5'd7
+`define M5_CANNY_RST 5'd8
+`define M5_WB_R 5'd9
+`define M5_WB_G 5'd10
+`define M5_WB_B 5'd11
+`define M5_WB_RST 5'd12
+`define M5_GAMMA 5'd13
+`define M5_GAMMA_P 5'd14
+`define M5_USB_MODE 5'd15
+`define M5_USB_SIZE 5'd16
+`define M5_USB_STOP 5'd17
+`define M5_ADC 5'd18
+`define M5_COUNT 21
+`define M5_CLOSED 2'd0
+`define M5_BROWSE 2'd1
+`define M5_EDIT 2'd2
+`define M5_DISP_WIDTH 156
+`define M5D_STATE 0
+`define M5D_CURSOR 2
+`define M5D_WINDOW 7
+`define M5D_VIEW 12
+`define M5D_FLAGS 14
+`define M5D_HIGH 21
+`define M5D_LOW 37
+`define M5D_WBR 53
+`define M5D_WBG 69
+`define M5D_WBB 85
+`define M5D_GAMMA 101
+`define M5D_USB_MODE 113
+`define M5D_USB_SIZE 116
+`define M5D_ADC0 118
+`define M5D_ADC1 134
+`define M5_BOOT 5'd19
+`define M5_LOAD 5'd20
+`define M5D_BOOT 150
+`define M5D_BOOT_STATUS 152
+`endif
