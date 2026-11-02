@@ -1,2 +1,0 @@
-这个是我们的完整源码，已经上传https://github.com/bullettuna/FinalEfinityFour  github仓库，是public的可以加个star支持一下嘿嘿；
-finalGamePC这个文件夹里面是电脑端的游戏内容，其他的都是fpga端的代码以及仿真还有bit和hex文件；

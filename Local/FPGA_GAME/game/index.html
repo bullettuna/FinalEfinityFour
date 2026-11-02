@@ -1,0 +1,3275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Soul Rider · 中世纪训练场</title>
+<style>
+  :root {
+    --gold: #f0c75e;
+    --gold-bright: #ffe08a;
+    --gold-deep: #b8892f;
+    --ink: #160f08;
+    --panel: rgba(22, 15, 8, 0.55);
+    --panel-border: rgba(240, 199, 94, 0.55);
+    --text: #f3e8d2;
+    --muted: #b9a98c;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #0c0805;
+    font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", system-ui, sans-serif;
+    color: var(--text);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* ===== 背景层 ===== */
+  .stage {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  .bg {
+    position: absolute;
+    inset: -4%;
+    background: url("background.png") center / cover no-repeat;
+    transform: scale(1.0);
+    transition: transform 0.3s ease-out;
+    will-change: transform;
+  }
+
+  /* 暗角 + 上部渐隐，保证文字可读 */
+  .vignette {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at center, rgba(0,0,0,0) 30%, rgba(10,6,2,0.55) 100%),
+      linear-gradient(180deg, rgba(10,6,2,0.35) 0%, rgba(10,6,2,0) 30%, rgba(10,6,2,0) 60%, rgba(10,6,2,0.65) 100%);
+    pointer-events: none;
+  }
+
+  /* ===== 粒子（火星 / 尘埃） ===== */
+  #fx {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  /* ===== 主菜单（篝火背景，骑士居左、文字居右） ===== */
+  .menu {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    overflow: hidden;
+    background: url("fire.png") center / cover no-repeat;
+    transition: opacity 0.35s ease;
+  }
+  .menu.hidden { opacity: 0; pointer-events: none; }
+  .menu::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.42) 55%, rgba(0,0,0,0.68) 100%);
+    pointer-events: none;
+  }
+  .menu-right {
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    z-index: 2;
+    width: min(420px, 46vw);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 7vh clamp(24px, 4vw, 64px);
+  }
+  .title-wrap { animation: rise 1s ease both; text-align: left; }
+  .title {
+    font-family: "Source Han Serif SC", "思源宋体", "Noto Serif SC", "Noto Serif CJK SC", "SimSun", serif;
+    font-size: clamp(28px, 3.5vw, 50px);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    color: #e6c088;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5), 0 0 26px rgba(230,170,100,0.3);
+  }
+  .rule {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 22px 0 36px;
+    max-width: 400px;
+  }
+  .rule::before, .rule::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(210,170,110,0.5), transparent);
+  }
+  .rule .diamond {
+    width: 8px; height: 8px;
+    background: #c79a5c;
+    transform: rotate(45deg);
+    box-shadow: 0 0 8px rgba(210,170,110,0.4);
+  }
+
+  /* 按钮列表 */
+  .nav {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: min(320px, 72vw);
+    animation: rise 1s 0.15s ease both;
+  }
+  .btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 11px 6px;
+    font-family: "Source Han Serif SC", "思源宋体", "Noto Serif SC", "Noto Serif CJK SC", "SimSun", serif;
+    font-size: 23px;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    color: #c79a5c;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.2s ease, text-shadow 0.2s ease, transform 0.2s ease;
+    outline: none;
+  }
+  /* 选中标记（菱形） */
+  .btn::before {
+    content: "";
+    position: absolute;
+    left: -16px;
+    top: 50%;
+    width: 7px; height: 7px;
+    background: #e6c088;
+    transform: translateY(-50%) rotate(45deg);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    box-shadow: 0 0 9px rgba(235,180,100,0.6);
+  }
+  .btn .ico {
+    display: block;
+    width: 20px; height: 20px;
+    flex: 0 0 auto;
+    color: #d4a866;
+    filter: drop-shadow(0 0 6px rgba(220,160,90,0.3));
+    transition: color 0.2s ease;
+  }
+  .btn .tag {
+    margin-left: 10px;
+    font-family: "Source Han Serif SC", "思源宋体", "Noto Serif SC", "SimSun", serif;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: #8a6a44;
+  }
+
+  .btn:hover, .btn.focus {
+    color: #f2d6a0;
+    transform: translateX(3px);
+    text-shadow: 0 0 14px rgba(240,190,120,0.35);
+  }
+  .btn:hover::before, .btn.focus::before { opacity: 1; }
+  .btn:hover .ico, .btn.focus .ico { color: #f0d6a0; }
+  .btn:hover .tag, .btn.focus .tag { color: #d4a866; }
+  .btn:active { transform: translateX(3px) scale(0.99); }
+
+  .btn.disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .footer {
+    position: absolute;
+    right: clamp(24px, 4vw, 64px);
+    bottom: 24px;
+    text-align: left;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    color: rgba(214, 178, 130, 0.82);
+    z-index: 11;
+    animation: fade 1.6s 0.6s ease both;
+  }
+  .footer b { color: #e6c088; font-weight: 600; }
+
+  /* ===== 弹窗 ===== */
+  .overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(6,4,2,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 20;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .overlay.show { opacity: 1; pointer-events: auto; }
+
+  .modal {
+    width: min(460px, 90vw);
+    background: linear-gradient(180deg, #241a10 0%, #16100a 100%);
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+    transform: translateY(12px) scale(0.97);
+    transition: transform 0.25s ease;
+    overflow: hidden;
+  }
+  .overlay.show .modal { transform: none; }
+
+  .modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(240,199,94,0.25);
+    background: rgba(240,199,94,0.06);
+  }
+  .modal-head h2 {
+    font-size: 16px;
+    letter-spacing: 0.2em;
+    color: var(--gold-bright);
+  }
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 22px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px 8px;
+  }
+  .modal-close:hover { color: var(--gold); }
+
+  .modal-body { padding: 22px 24px; font-size: 14px; line-height: 1.9; color: var(--text); }
+
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 14px 0;
+  }
+  .row label { color: var(--muted); white-space: nowrap; }
+  .row .val { color: var(--gold); min-width: 34px; text-align: right; font-size: 13px; }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(240,199,94,0.25);
+    outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: 2px solid #241a10;
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(240,199,94,0.6);
+  }
+
+  .mini-btn {
+    padding: 6px 14px;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    color: var(--text);
+    background: rgba(240,199,94,0.1);
+    border: 1px solid var(--panel-border);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .mini-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  .about-credit { margin-top: 10px; padding: 12px; background: rgba(0,0,0,0.25); border-radius: 4px; font-size: 12px; color: var(--muted); }
+
+  /* ===== 关于页面（独立页面） ===== */
+  .page {
+    position: absolute;
+    inset: 0;
+    z-index: 22;
+    display: flex;
+    flex-direction: column;
+    background: rgba(8,5,2,0.92);
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .page.show { opacity: 1; pointer-events: auto; }
+
+  .page-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px clamp(18px, 4vw, 44px);
+    border-bottom: 1px solid rgba(240,199,94,0.25);
+    background: rgba(240,199,94,0.05);
+  }
+  .page-top h2 {
+    font-size: 18px;
+    letter-spacing: 0.22em;
+    color: var(--gold-bright);
+  }
+  .page-top-filler { flex: 1; }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    color: var(--text);
+    background: rgba(240,199,94,0.1);
+    border: 1px solid var(--panel-border);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .back-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  .page-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: clamp(24px, 4vw, 48px) clamp(20px, 6vw, 72px);
+  }
+  .page-inner {
+    max-width: 820px;
+    margin: 0 auto;
+    font-size: 15px;
+    line-height: 2;
+    color: var(--text);
+  }
+  .page-inner h3 {
+    margin: 22px 0 10px;
+    padding-left: 10px;
+    border-left: 3px solid var(--gold);
+    color: var(--gold-bright);
+    font-size: 15px;
+    letter-spacing: 0.14em;
+  }
+  .page-inner h4 {
+    margin: 16px 0 6px;
+    color: var(--gold);
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+  }
+  .about-lead { font-size: 16px; }
+  .about-sub { color: var(--muted); }
+  .modal-body h3 {
+    margin: 14px 0 6px;
+    padding-left: 9px;
+    border-left: 3px solid var(--gold);
+    color: var(--gold-bright);
+    font-size: 13px;
+    letter-spacing: 0.14em;
+  }
+  .modal-body ul { margin: 0 0 6px; padding-left: 18px; }
+  .modal-body li { margin: 3px 0; font-size: 13px; line-height: 1.7; }
+  .modal-body code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 12px;
+    color: var(--gold);
+    background: rgba(240,199,94,0.10);
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+
+  /* ===== 进入游戏加载层 ===== */
+  #game-loading {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    background: #0a0603;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+  #game-loading.show { opacity: 1; pointer-events: auto; }
+  #game-loading .ld-text { letter-spacing: 0.3em; font-size: 16px; color: var(--gold); margin-bottom: 22px; }
+  .bar {
+    width: min(320px, 80vw);
+    height: 3px;
+    background: rgba(240,199,94,0.2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .bar .fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--gold-deep), var(--gold-bright));
+    box-shadow: 0 0 14px rgba(240,199,94,0.7);
+    transition: width 0.08s linear;
+  }
+  /* ===== 游戏场景 ===== */
+  #game {
+    position: absolute;
+    inset: 0;
+    z-index: 25;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  #game.show { display: block; }
+  #game.fade { opacity: 1; }
+
+  .camera-world {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    transform-origin: 50% 50%;
+    will-change: transform;
+  }
+  .camera-world.world-frozen .game-bg {
+    animation-play-state: paused;
+  }
+
+  .game-bg {
+    position: absolute;
+    inset: -2%;
+    overflow: hidden;
+    background: #72b8f4;
+    animation: bgZoom 30s ease-in-out infinite alternate;
+  }
+  .parallax-layer {
+    position: absolute;
+    inset: 0;
+    background-repeat: repeat-x;
+    background-position: left bottom;
+    background-size: auto 100%;
+    image-rendering: pixelated;
+    pointer-events: none;
+  }
+  .parallax-sky { background-image: url("classic/backgrounds/castle_town/layer_1_sky.png"); }
+  .parallax-mountains { background-image: url("classic/backgrounds/castle_town/layer_2_mountains.png"); }
+  .parallax-hills { background-image: url("classic/backgrounds/castle_town/layer_3_hills.png"); }
+  .parallax-forest { background-image: url("classic/backgrounds/castle_town/layer_4_forest.png"); }
+  .parallax-foreground { background-image: url("classic/backgrounds/castle_town/layer_5_foreground.png"); }
+  @keyframes bgZoom {
+    from { transform: scale(1); }
+    to   { transform: scale(1.06); }
+  }
+  .game-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0) 45%, rgba(10,6,2,0.5) 100%);
+    pointer-events: none;
+  }
+  .dmg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(255,0,0,0) 35%, rgba(200,20,20,0.5) 100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.12s ease;
+    z-index: 6;
+  }
+  .dmg.on { opacity: 1; }
+
+  /* ===== 怪物 ===== */
+  .monster {
+    --monster-dir: 1;
+    position: absolute;
+    bottom: 3%;
+    left: 56%;
+    width: clamp(210px, 24vw, 340px);
+    aspect-ratio: 1;
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateX(-50%) scale(0.4);
+    transform-origin: bottom center;
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+  }
+  .monster.alive {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+  .monster-sprite {
+    width: 100%;
+    height: 100%;
+    background-image: url("classic/monster/minotaur_earth.png");
+    background-repeat: no-repeat;
+    background-size: 500% 300%;
+    background-position: 0% 0%;
+    image-rendering: pixelated;
+    transform: translateY(24%) scaleX(var(--monster-dir));
+    user-select: none;
+    transition: transform 0.15s ease;
+  }
+  .monster.flip { --monster-dir: -1; }
+  .monster.dash { z-index: 7; }
+  .monster.dash .monster-sprite { transform: translateY(24%) scaleX(var(--monster-dir)) scale(1.08); }
+  .monster.windup .monster-sprite {
+    animation: windupRedFlash 0.28s ease-in-out infinite;
+  }
+  @keyframes windupRedFlash {
+    0%, 100% {
+      filter: brightness(1.15) saturate(3.5) hue-rotate(325deg) drop-shadow(0 0 6px rgba(255, 0, 0, 0.8));
+    }
+    50% {
+      filter: brightness(1.65) saturate(5) hue-rotate(325deg) drop-shadow(0 0 24px rgba(255, 0, 0, 1));
+    }
+  }
+  .monster.dying {
+    animation: minotaurDeath 900ms steps(1, end) forwards;
+  }
+  @keyframes minotaurDeath {
+    0%, 18%, 36%, 54%, 72% { opacity: 1; }
+    9%, 27%, 45%, 63%, 81% { opacity: 0.12; }
+    100% { opacity: 0; }
+  }
+  .monster-shadow {
+    position: absolute;
+    bottom: -2%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 62%;
+    height: 7%;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.55), rgba(0,0,0,0) 70%);
+    filter: blur(2px);
+  }
+
+  /* ===== 玩家（骑士） ===== */
+  .player {
+    position: absolute;
+    bottom: 3%;
+    left: 18%;
+    width: clamp(200px, 28vw, 480px);
+    aspect-ratio: 100 / 55;
+    z-index: 6;
+    pointer-events: none;
+    transform: translateX(-50%);
+    transition: transform 0.12s ease;
+    transform-origin: bottom center;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+  }
+  .player-sprite {
+    position: relative;
+    z-index: 5;
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    image-rendering: pixelated;
+    user-select: none;
+  }
+  .rage-slash {
+    position: absolute;
+    left: 54%;
+    top: 46%;
+    z-index: 4;
+    width: 165%;
+    height: 220%;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -50%) rotate(-20deg) scale(0.55);
+    transform-origin: 50% 50%;
+    filter: drop-shadow(0 0 10px rgba(255,40,20,0.8));
+    mix-blend-mode: screen;
+  }
+  .rage-slash svg { width: 100%; height: 100%; overflow: visible; }
+  .rage-slash-glow {
+    fill: #ff1b14;
+    opacity: 0.3;
+    filter: blur(12px);
+  }
+  .rage-slash-spark { fill: #ffd36a; }
+  .rage-slash.active {
+    animation: rageSlashSweep 460ms cubic-bezier(0.15, 0.75, 0.25, 1) forwards;
+  }
+  .rage-slash.active .rage-slash-spark {
+    animation: rageSpark 420ms ease-out forwards;
+  }
+  @keyframes rageSlashSweep {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -50%) rotate(-20deg) scale(0.55);
+    }
+    12% {
+      opacity: 1;
+      transform: translate(-50%, -50%) rotate(-5deg) scale(1.05);
+    }
+    56% {
+      opacity: 0.92;
+      transform: translate(-50%, -50%) rotate(3deg) scale(1.28);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -50%) rotate(10deg) scale(1.5);
+    }
+  }
+  @keyframes rageSpark {
+    0% { opacity: 1; transform: translate(0, 0) scale(0.8); }
+    100% { opacity: 0; transform: translate(26px, -20px) scale(1.7); }
+  }
+  .player-shadow {
+    position: absolute;
+    bottom: -2%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 56%;
+    height: 7%;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.5), rgba(0,0,0,0) 70%);
+    filter: blur(2px);
+  }
+
+  .hud-cam {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    background: rgba(18,12,6,0.55);
+    border: 1px solid rgba(240,199,94,0.4);
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--muted);
+    backdrop-filter: blur(3px);
+  }
+  .hud-cam .cam-dot { width: 9px; height: 9px; border-radius: 50%; background: #c0392b; box-shadow: 0 0 6px #c0392b; }
+  .hud-cam.on .cam-dot { background: #2ecc71; box-shadow: 0 0 6px #2ecc71; }
+  .hud-cam.on .cam-txt { color: var(--gold-bright); }
+
+  .hud {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    z-index: 7;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .hud-player {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    background: rgba(18,12,6,0.55);
+    border: 1px solid rgba(240,199,94,0.4);
+    border-radius: 6px;
+    font-size: 14px;
+    letter-spacing: 0.12em;
+    color: var(--text);
+    backdrop-filter: blur(3px);
+  }
+  .hud-avatar { font-size: 16px; }
+  .hud-name { color: var(--gold-bright); font-weight: 600; }
+
+  .hud-hearts { display: flex; gap: 6px; }
+  .heart {
+    width: 32px;
+    height: 32px;
+    filter: drop-shadow(0 0 6px rgba(255,70,80,0.55));
+    transition: transform 0.2s ease, filter 0.3s ease;
+  }
+  .heart.empty {
+    filter: grayscale(1) brightness(0.55);
+  }
+  .heart.pop { animation: heartbeat 0.4s ease; }
+  @keyframes heartbeat {
+    0% { transform: scale(1); }
+    35% { transform: scale(1.4); }
+    70% { transform: scale(0.85); }
+    100% { transform: scale(1); }
+  }
+
+  .rage-meter {
+    width: clamp(160px, 15vw, 220px);
+    padding: 7px 10px 8px;
+    border: 1px solid rgba(240,199,94,0.38);
+    border-radius: 6px;
+    background: rgba(18,12,6,0.58);
+    backdrop-filter: blur(3px);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .rage-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+  }
+  .rage-value { color: var(--gold-bright); font-family: Consolas, monospace; }
+  .rage-track {
+    height: 7px;
+    overflow: hidden;
+    border: 1px solid rgba(240,199,94,0.28);
+    border-radius: 4px;
+    background: rgba(0,0,0,0.5);
+  }
+  .rage-fill {
+    width: 0%;
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #a83428, #ef6b32 62%, #ffd36a);
+    box-shadow: 0 0 8px rgba(255,90,45,0.55);
+    transition: width 0.08s linear;
+  }
+  .rage-meter.full {
+    border-color: rgba(255,104,62,0.9);
+    box-shadow: 0 0 18px rgba(255,70,35,0.42);
+    animation: rageReadyPulse 0.7s ease-in-out infinite alternate;
+  }
+  .rage-meter.full .rage-value { color: #ffb06d; }
+  @keyframes rageReadyPulse {
+    from { box-shadow: 0 0 10px rgba(255,70,35,0.28); }
+    to   { box-shadow: 0 0 24px rgba(255,70,35,0.62); }
+  }
+
+  .game-hint {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 20px;
+    text-align: center;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    z-index: 7;
+  }
+  .game-hint b { color: var(--gold); font-weight: 600; }
+
+  .attack-btn {
+    position: absolute;
+    right: 18px;
+    bottom: 18px;
+    z-index: 7;
+    padding: 10px 18px;
+    font-size: 15px;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background: rgba(120, 30, 30, 0.6);
+    border: 1px solid rgba(255, 120, 120, 0.6);
+    border-radius: 4px;
+    cursor: pointer;
+    backdrop-filter: blur(3px);
+    transition: all 0.2s ease;
+  }
+  .attack-btn:hover {
+    background: rgba(160, 40, 40, 0.8);
+    border-color: #ff8a8a;
+    box-shadow: 0 0 16px rgba(255, 60, 60, 0.5);
+    transform: translateY(-1px);
+  }
+  .attack-btn:active { transform: translateY(0) scale(0.97); }
+
+  /* ===== 摄像头画面（传输过来的图像） ===== */
+  .cam-view {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    z-index: 7;
+    width: clamp(307.2px, 46.08vw, 614.4px);
+    aspect-ratio: 16 / 9;
+    border: 1px solid rgba(240,199,94,0.5);
+    border-radius: 6px;
+    overflow: hidden;
+    background: #0a0603;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.5);
+  }
+  .cam-view img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    background: #000;
+  }
+  .cam-view .cam-label {
+    position: absolute;
+    left: 0; top: 0;
+    padding: 3px 8px;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--gold);
+    background: rgba(10,6,3,0.72);
+  }
+  .cam-view .cam-none {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: #8a7a5f;
+    text-align: center;
+  }
+
+  .gameover {
+    position: absolute;
+    inset: 0;
+    z-index: 8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(30,5,5,0.55);
+    backdrop-filter: blur(3px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+  .gameover.show { opacity: 1; pointer-events: auto; }
+  .gameover h2 {
+    font-size: clamp(34px, 6vw, 60px);
+    color: #e5504f;
+    letter-spacing: 0.18em;
+    text-shadow: 0 0 24px rgba(255,0,0,0.5);
+  }
+  .gameover p { margin: 10px 0 26px; color: var(--text); font-size: 14px; letter-spacing: 0.1em; }
+  .gameover-btns { display: flex; gap: 14px; }
+  .gameover-btns .mini-btn { font-size: 15px; padding: 9px 22px; }
+
+  /* ===== 游戏内调试抽屉 ===== */
+  .debug-drawer {
+    position: absolute;
+    inset: 0;
+    z-index: 12;
+    display: flex;
+    justify-content: flex-end;
+    background: linear-gradient(90deg, rgba(4,3,2,0.08), rgba(4,3,2,0.55));
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .debug-drawer.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .debug-panel {
+    width: min(520px, 92vw);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: clamp(28px, 5vh, 52px) clamp(24px, 4vw, 54px) clamp(24px, 4vh, 42px);
+    background:
+      linear-gradient(90deg, rgba(8,6,4,0.08) 0%, rgba(8,6,4,0.78) 18%, rgba(8,6,4,0.95) 52%, rgba(8,6,4,0.99) 100%);
+    border-left: 1px solid rgba(240,199,94,0.2);
+    box-shadow: -32px 0 80px rgba(0,0,0,0.62);
+    transform: translateX(28px);
+    transition: transform 0.28s ease;
+  }
+  .debug-drawer.show .debug-panel { transform: none; }
+  .debug-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: clamp(46px, 11vh, 104px);
+  }
+  .debug-head h2 {
+    font-family: "Source Han Serif SC", "思源宋体", "Noto Serif SC", "SimSun", serif;
+    font-size: clamp(25px, 2.7vw, 38px);
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    color: var(--gold-bright);
+    text-shadow: 0 0 22px rgba(240,199,94,0.2);
+  }
+  .debug-close {
+    width: 38px;
+    height: 38px;
+    border: 1px solid rgba(240,199,94,0.28);
+    border-radius: 50%;
+    background: rgba(240,199,94,0.05);
+    color: var(--muted);
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+  }
+  .debug-close:hover,
+  .debug-close:focus-visible {
+    border-color: var(--gold);
+    color: var(--gold-bright);
+    background: rgba(240,199,94,0.12);
+    outline: none;
+  }
+  .debug-section-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: var(--gold);
+    font-family: "Source Han Serif SC", "思源宋体", "Noto Serif SC", "SimSun", serif;
+    font-size: 14px;
+    letter-spacing: 0.18em;
+  }
+  .debug-section-title::before,
+  .debug-section-title::after {
+    content: "";
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(240,199,94,0.42));
+  }
+  .debug-section-title::before { width: 22px; }
+  .debug-section-title::after { flex: 1; }
+  .debug-panel section + section { margin-top: 32px; }
+  .debug-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-top: 18px;
+    padding: 24px 0;
+    border-top: 1px solid rgba(240,199,94,0.13);
+    border-bottom: 1px solid rgba(240,199,94,0.13);
+    color: var(--text);
+    font-size: 15px;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+  }
+  .input-mode-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 18px;
+  }
+  .input-mode-tab {
+    padding: 13px 12px;
+    border: 1px solid rgba(240,199,94,0.2);
+    background: rgba(0,0,0,0.24);
+    color: var(--muted);
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+  }
+  .input-mode-tab strong {
+    display: block;
+    margin-bottom: 4px;
+    color: inherit;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .input-mode-tab span {
+    color: inherit;
+    font-size: 11px;
+    opacity: 0.72;
+  }
+  .input-mode-tab.active {
+    border-color: rgba(240,199,94,0.75);
+    background: rgba(240,199,94,0.12);
+    color: var(--gold-bright);
+  }
+  .input-mode-tab:focus-visible {
+    outline: 1px solid var(--gold-bright);
+    outline-offset: 2px;
+  }
+  .toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex: 0 0 auto;
+  }
+  .toggle input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .toggle-track {
+    position: relative;
+    width: 54px;
+    height: 28px;
+    border: 1px solid rgba(185,169,140,0.45);
+    border-radius: 14px;
+    background: rgba(0,0,0,0.35);
+    transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  }
+  .toggle-thumb {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--muted);
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  .toggle input:checked + .toggle-track {
+    border-color: rgba(240,199,94,0.75);
+    background: rgba(240,199,94,0.16);
+    box-shadow: 0 0 15px rgba(240,199,94,0.15);
+  }
+  .toggle input:checked + .toggle-track .toggle-thumb {
+    transform: translateX(26px);
+    background: var(--gold-bright);
+  }
+  .toggle input:focus-visible + .toggle-track {
+    outline: 1px solid var(--gold-bright);
+    outline-offset: 3px;
+  }
+  .toggle-state {
+    min-width: 30px;
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+  .toggle input:checked ~ .toggle-state { color: var(--gold-bright); }
+  .debug-exit {
+    width: 100%;
+    margin-top: auto;
+    padding: 15px 22px;
+    border: 1px solid rgba(240,199,94,0.4);
+    background: rgba(18,12,6,0.7);
+    color: var(--text);
+    font-size: 15px;
+    letter-spacing: 0.18em;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+  }
+  .debug-exit:hover,
+  .debug-exit:focus-visible {
+    border-color: var(--gold);
+    color: var(--gold-bright);
+    background: rgba(240,199,94,0.08);
+    outline: none;
+  }
+  @media (max-width: 640px) {
+    .menu { background-position: 30% center; }
+    .menu-right {
+      width: 100%;
+      padding: 8vh 20px 84px 43vw;
+    }
+    .title { font-size: clamp(28px, 8vw, 38px); }
+    .rule { margin: 16px 0 24px; }
+    .nav { width: 100%; gap: 10px; }
+    .btn {
+      gap: 8px;
+      padding: 8px 4px;
+      font-size: clamp(17px, 5vw, 21px);
+      letter-spacing: 0.14em;
+    }
+    .btn .ico { width: 18px; height: 18px; }
+    .btn .tag { display: none; }
+    .footer {
+      right: 20px;
+      bottom: 14px;
+      left: 20px;
+      line-height: 1.5;
+      text-align: left;
+    }
+    .debug-panel {
+      width: 100%;
+      padding: 24px 22px 26px;
+      border-left: none;
+      background: linear-gradient(180deg, rgba(8,6,4,0.99), rgba(8,6,4,0.96));
+    }
+    .debug-head { margin-bottom: clamp(38px, 9vh, 72px); }
+    .debug-head h2 { font-size: 28px; }
+    .debug-row { gap: 14px; font-size: 14px; }
+  }
+
+  /* ===== Toast ===== */
+  #toast {
+    position: absolute;
+    left: clamp(16px, 3vw, 46px);
+    bottom: clamp(64px, 10vh, 110px);
+    transform: translateY(16px);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 220px;
+    max-width: min(540px, calc(100vw - 32px));
+    background: linear-gradient(90deg, rgba(18,34,25,0.96), rgba(10,14,12,0.90));
+    border: 1px solid rgba(77,164,106,0.48);
+    border-left: 4px solid #43d17f;
+    border-radius: 4px;
+    padding: 11px 18px 11px 15px;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--text);
+    letter-spacing: 0.06em;
+    opacity: 0;
+    transition: opacity 0.45s ease, transform 0.45s ease;
+    z-index: 40;
+    pointer-events: none;
+    white-space: normal;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.32);
+    backdrop-filter: blur(4px);
+  }
+  #toast::before {
+    content: "!";
+    flex: 0 0 20px;
+    width: 20px;
+    height: 20px;
+    display: grid;
+    place-items: center;
+    border-radius: 2px;
+    background: #43d17f;
+    color: #0b1710;
+    font-weight: 800;
+    font-size: 13px;
+    line-height: 1;
+    letter-spacing: 0;
+  }
+  #toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ===== 动画 ===== */
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(26px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+</style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <div class="bg" id="bg"></div>
+    <div class="vignette"></div>
+    <canvas id="fx"></canvas>
+
+    <!-- 主菜单 -->
+    <div class="menu" id="menu">
+      <div class="menu-right">
+        <div class="title-wrap">
+          <h1 class="title">Soul Rider</h1>
+          <div class="rule"><span class="diamond"></span><span class="diamond"></span><span class="diamond"></span></div>
+        </div>
+
+        <nav class="nav" id="nav">
+          <button class="btn" data-action="start">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M21 3L3 21"/><path d="M3 3l5 0M21 3l-5 0M3 21l5 0M21 21l-5 0"/></svg>开始游戏<span class="tag">Enter</span>
+          </button>
+          <button class="btn" data-action="debug">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>调试模式
+          </button>
+          <button class="btn" data-action="settings">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="2.8"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.9 1.9M16.8 16.8l1.9 1.9M18.7 5.3l-1.9 1.9M7.2 16.8l-1.9 1.9"/></svg>设置
+          </button>
+          <button class="btn" data-action="about">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5"/><path d="M12 7.6v.01"/></svg>关于
+          </button>
+          <button class="btn" data-action="exit">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4"/><path d="M15 8l4 4-4 4"/><path d="M19 12H9"/></svg>退出游戏
+          </button>
+        </nav>
+      </div>
+    </div>
+
+    <div class="footer">
+      <b>Soul Rider</b> · v0.1.0 &nbsp;|&nbsp; 方向键 ↑↓ 选择，Enter 确认，Esc 返回
+    </div>
+
+    <!-- 设置弹窗 -->
+    <div class="overlay" id="overlay-settings">
+      <div class="modal">
+        <div class="modal-head">
+          <h2>设 置</h2>
+          <button class="modal-close" data-close="settings">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <label>音乐音量</label>
+            <input type="range" id="vol-music" min="0" max="100" value="70" />
+            <span class="val" id="val-music">70</span>
+          </div>
+          <div class="row">
+            <label>音效音量</label>
+            <input type="range" id="vol-sfx" min="0" max="100" value="80" />
+            <span class="val" id="val-sfx">80</span>
+          </div>
+          <div class="row">
+            <label>全屏模式</label>
+            <button class="mini-btn" id="btn-fullscreen">进入全屏</button>
+          </div>
+          <div class="row">
+            <label>界面粒子</label>
+            <button class="mini-btn" id="btn-particles">开启</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 关于页面（独立页面） -->
+    <div class="page" id="page-about">
+      <div class="page-top">
+        <button class="back-btn" id="about-back">← 返回</button>
+        <h2>关 于</h2>
+        <span class="page-top-filler"></span>
+      </div>
+      <div class="page-body">
+        <div class="page-inner">
+          <p class="about-lead"><b style="color:var(--gold-bright)">Soul Rider</b> · 中世纪训练场体感游戏</p>
+          <p class="about-sub">浏览器双击即玩，无需联网安装。骑士动作由「<b style="color:var(--gold)">观动智造</b>」系统的 FPGA 实时视觉识别驱动。</p>
+
+          <h3>观动智造 · 现实与虚拟的联动</h3>
+          <p>这款游戏，只是「现实与虚拟联动」的一次有趣展示。项目名「观动智造」——「观」是视觉，「动」是动作，「智造」是让机器看懂人、跟着人走。</p>
+          <p>整套系统的处理链路：<b style="color:var(--gold)">摄像头（SC2210）</b>采集画面 → <b style="color:var(--gold)">FPGA（Ti60F225）</b>做边缘处理（去噪、边缘检测、人体前景提取）→ <b style="color:var(--gold)">YOLO11n Pose</b>识别人体 <b style="color:var(--gold)">17 个关键节点</b>（COCO 格式）并映射成骑士骨架 → 电脑端还原出数字骨架，驱动数字人、机器人或游戏角色。</p>
+          <p>核心优势是<b style="color:var(--gold)">低成本</b>：市面常见动捕要把传感器绑在身上逐点测角度，精密但昂贵；我们只需一个摄像头接上 FPGA 与电脑，实测姿态识别精度 <b style="color:var(--gold)">mAP50 ≈ 0.586</b>、端到端延迟约 0.4 秒。</p>
+          <p>目前骨架覆盖 17 个关键节点（含双腿）。算法优化后还能继续增加到 23 个、50 个节点，动作更精细，以低成本实现远程控制。</p>
+
+          <h3>应用场景</h3>
+
+          <h4>实际场景应用 · 工业机器人操控</h4>
+          <p>骨架最直接的应用是<b style="color:var(--gold)">工业机器人操控</b>：把骨架关键点映射成机械臂或机器人的关节角度，人在摄像头前做动作，远端机器人同步执行。仓储分拣、抓取、装配、教学演示这类对精度要求不高的任务，不必穿戴动捕服，一个摄像头就能远程操控。</p>
+
+          <h4>虚拟场景应用 · VR 与数字人</h4>
+          <p>在<b style="color:var(--gold)">虚拟现实（VR）</b>方向，骨架数据可以直接喂给数字人，实时驱动虚拟主播、教学助手或游戏角色——本游戏正是这个形态的一次展示。</p>
+          <p>更远的目标是<b style="color:var(--gold)">无接触式 VR</b>：不再需要手柄、手套，用户的身体动作本身就是输入。用两个垂直放置的摄像头重建三维人体模型，实现无接触式三维动作捕捉，让虚拟世界里的角色跟着真实的人一起动。</p>
+
+          <h3>装置独有的优势</h3>
+          <p>在 VR 交互中，人体信息获取大致分为两类：<b style="color:var(--gold)">用户主动输入</b>（手柄、手套、语音、EMG 等）与<b style="color:var(--gold)">系统被动感知</b>（摄像头视觉、惯性动捕、眼动/面部、生理传感器等）。</p>
+          <p>相较之下，不需要穿戴大量设备或特殊工作服，我们的光学摄像头方案<b style="color:var(--gold)">操作更简便、成本也更低</b>。相比于市面上常见的采集彩色图片转骨架图，通过<b style="color:var(--gold)">边缘检测转骨架图</b>的技术，更擅长应对<b style="color:var(--gold)">极端光照环境</b>下的人体识别与检测——例如强光、黑暗，在这种环境下边缘检测具有更好的稳定性，而且边缘检测二值图内存占用更少、系统内存占用率更低。</p>
+
+          <div class="about-credit">
+            背景美术素材：Nasha's Parallax Worlds — Castle Town<br />
+            版本 v0.2.0 &nbsp;·&nbsp; 制作日期 2026
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 游戏场景 -->
+    <div id="game">
+      <div class="camera-world" id="camera-world">
+        <div class="game-bg" aria-hidden="true">
+          <div class="parallax-layer parallax-sky"></div>
+          <div class="parallax-layer parallax-mountains"></div>
+          <div class="parallax-layer parallax-hills"></div>
+          <div class="parallax-layer parallax-forest"></div>
+          <div class="parallax-layer parallax-foreground"></div>
+        </div>
+        <div class="game-vignette"></div>
+
+        <!-- 怪物 -->
+        <div class="monster" id="monster">
+          <div class="monster-sprite" id="monster-sprite" role="img" aria-label="牛头人"></div>
+          <div class="monster-shadow"></div>
+        </div>
+
+        <!-- 玩家（骑士，摄像头/键盘驱动） -->
+        <div class="player" id="player">
+          <div class="rage-slash" id="rage-slash" aria-hidden="true">
+            <svg viewBox="0 0 600 300">
+              <defs>
+                <linearGradient id="rage-slash-gradient" x1="0" y1="1" x2="1" y2="0">
+                  <stop offset="0" stop-color="#7c0909" />
+                  <stop offset="0.45" stop-color="#ff2b1f" />
+                  <stop offset="1" stop-color="#ffb45e" />
+                </linearGradient>
+                <linearGradient id="rage-slash-core-gradient" x1="0" y1="1" x2="1" y2="0">
+                  <stop offset="0" stop-color="#ff6d4a" stop-opacity="0" />
+                  <stop offset="0.5" stop-color="#ffd7a3" stop-opacity="0.9" />
+                  <stop offset="1" stop-color="#fff2d0" stop-opacity="0" />
+                </linearGradient>
+              </defs>
+              <path
+                class="rage-slash-glow"
+                d="M55 255 C160 220 280 118 545 30 C420 125 330 185 270 242 C215 292 124 300 55 255 Z"
+              />
+              <path
+                fill="url(#rage-slash-gradient)"
+                d="M78 252 C180 212 292 118 525 45 C410 137 332 191 278 238 C228 280 145 292 78 252 Z"
+              />
+              <path
+                fill="url(#rage-slash-core-gradient)"
+                d="M118 246 C215 200 320 120 500 64 C395 148 330 198 282 238 C244 270 178 282 118 246 Z"
+              />
+              <circle class="rage-slash-spark" cx="470" cy="58" r="5" />
+              <circle class="rage-slash-spark" cx="410" cy="108" r="3.5" />
+              <circle class="rage-slash-spark" cx="346" cy="166" r="3" />
+            </svg>
+          </div>
+          <img class="player-sprite" id="player-sprite" src="classic/hero/idle_0.png" alt="骑士" draggable="false" />
+          <div class="player-shadow"></div>
+        </div>
+      </div>
+      <div class="dmg" id="dmg"></div>
+
+      <!-- 左上角血量 -->
+      <div class="hud">
+        <div class="hud-player">
+          <span class="hud-avatar">⚔️</span>
+          <span class="hud-name">骑士</span>
+        </div>
+        <div class="hud-cam" id="hud-cam"><span class="cam-dot"></span><span class="cam-txt">摄像头未连接</span></div>
+        <div class="hud-cam" id="hud-pose"><span class="cam-dot" style="background:#f0c75e;box-shadow:0 0 6px #f0c75e;"></span><span class="cam-txt" style="color:var(--gold-bright);">动作 · 待机</span></div>
+        <div class="hud-hearts" id="hearts"></div>
+        <div class="rage-meter" id="rage-meter">
+          <div class="rage-head">
+            <span>怒气</span>
+            <span class="rage-value" id="rage-value">0%</span>
+          </div>
+          <div
+            class="rage-track"
+            id="rage-track"
+            role="progressbar"
+            aria-label="怒气值"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="0"
+          >
+            <div class="rage-fill" id="rage-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 摄像头画面：FPGA 板检测出的人体图像，传到电脑后显示 + 备份 -->
+      <div class="cam-view" id="cam-view">
+        <span class="cam-label">摄像头画面</span>
+        <img id="cam-img" alt="摄像头画面" draggable="false" />
+        <div class="cam-none">坐标方案 · 无画面预览</div>
+      </div>
+
+      <div class="game-hint">英雄骑士 &nbsp;·&nbsp; <b>A/←</b> 左砍 &nbsp;·&nbsp; <b>D/→</b> 右砍 &nbsp;·&nbsp; <b>S</b> 防御(按住) &nbsp;·&nbsp; <b>K</b> 自动 &nbsp;·&nbsp; <b>Esc</b> 调试</div>
+      <button class="attack-btn" id="btn-attack">⚔️ 攻击</button>
+
+      <div class="debug-drawer" id="debug-drawer" aria-hidden="true">
+        <aside class="debug-panel" role="dialog" aria-modal="true" aria-labelledby="debug-title">
+          <header class="debug-head">
+            <h2 id="debug-title">调试</h2>
+            <button class="debug-close" id="debug-close" type="button" aria-label="返回游戏">×</button>
+          </header>
+
+          <section aria-labelledby="debug-game-title">
+            <h3 class="debug-section-title" id="debug-game-title">游戏</h3>
+            <label class="debug-row" for="infinite-hp">
+              <span>无限血量</span>
+              <span class="toggle">
+                <input id="infinite-hp" type="checkbox" checked />
+                <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                <span class="toggle-state" id="infinite-hp-state">开启</span>
+              </span>
+            </label>
+          </section>
+
+          <section aria-labelledby="debug-inference-title">
+            <h3 class="debug-section-title" id="debug-inference-title">推理模式</h3>
+            <div class="input-mode-tabs" id="game-input-mode-tabs" role="tablist" aria-label="输入模式">
+              <button class="input-mode-tab active" type="button" data-game-mode="yolo" role="tab" aria-selected="true">
+                <strong>YOLO 17 点</strong>
+                <span>电脑推理 · kind3</span>
+              </button>
+              <button class="input-mode-tab" type="button" data-game-mode="eleven_point" role="tab" aria-selected="false">
+                <strong>FPGA 11 点</strong>
+                <span>坐标识别 · kind5</span>
+              </button>
+            </div>
+          </section>
+
+          <button class="debug-exit" id="debug-exit" type="button">退出游戏</button>
+        </aside>
+      </div>
+
+      <div class="gameover" id="gameover">
+        <h2>你已阵亡</h2>
+        <p>重整旗鼓，再战一场</p>
+        <div class="gameover-btns">
+          <button class="mini-btn" id="btn-restart">重新开始</button>
+          <button class="mini-btn" id="btn-backmenu">返回主菜单</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 进入游戏加载层 -->
+    <div id="game-loading">
+      <div class="ld-text">正在进入训练场…</div>
+      <div class="bar"><div class="fill" id="load-fill"></div></div>
+    </div>
+
+    <!-- Toast 提示 -->
+    <div id="toast" role="status" aria-live="polite"></div>
+  </div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ===== 音效与背景音乐 ===== */
+  var AC = window.AudioContext || window.webkitAudioContext;
+  var audio = null;
+  var sfxVol = 0.8;
+  var backgroundMusic = new Audio("audio/background-music.mp3");
+  backgroundMusic.loop = true;
+  backgroundMusic.preload = "auto";
+
+  function updateBackgroundMusicVolume() {
+    var slider = document.getElementById("vol-music");
+    var level = slider ? Number(slider.value) / 100 : 0.7;
+    backgroundMusic.volume = Math.max(0, Math.min(1, level * 0.45));
+  }
+
+  function startBackgroundMusic() {
+    updateBackgroundMusicVolume();
+    if (!backgroundMusic.paused) return;
+    try {
+      var playback = backgroundMusic.play();
+      if (playback && playback.catch) playback.catch(function () {});
+    } catch (e) {}
+  }
+
+  function ensureAudio() {
+    if (!audio) audio = new AC();
+    if (audio.state === "suspended") audio.resume();
+    startBackgroundMusic();
+  }
+  function beep(freq, dur, type, vol) {
+    if (!audio) return;
+    var t = audio.currentTime;
+    var o = audio.createOscillator();
+    var g = audio.createGain();
+    o.type = type || "sine";
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol * sfxVol, t + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(audio.destination);
+    o.start(t); o.stop(t + dur + 0.05);
+  }
+  var hoverSnd = function () { beep(660, 0.09, "sine", 0.10); };
+  var clickSnd = function () { beep(880, 0.14, "triangle", 0.16); beep(1320, 0.1, "sine", 0.08); };
+  var attackSfx = new Audio("audio/attack-swing.mp3");
+  var defenseSfx = new Audio("audio/defense-clash.mp3");
+  var empoweredSlashSfx = new Audio("audio/empowered-slash.mp3");
+  attackSfx.preload = "auto";
+  defenseSfx.preload = "auto";
+  empoweredSlashSfx.preload = "auto";
+
+  function playGameSfx(sfx) {
+    try {
+      sfx.pause();
+      sfx.currentTime = 0;
+    } catch (e) {}
+    try {
+      var playback = sfx.play();
+      if (playback && playback.catch) playback.catch(function () {});
+    } catch (e) {}
+  }
+
+  document.addEventListener("pointerdown", ensureAudio, { once: true, passive: true });
+  window.addEventListener("keydown", ensureAudio, { once: true });
+
+  /* ===== 元素引用 ===== */
+  var stage = document.getElementById("stage");
+  var bg = document.getElementById("bg");
+  var nav = document.getElementById("nav");
+  var buttons = Array.prototype.slice.call(nav.querySelectorAll(".btn"));
+  var aboutPage = document.getElementById("page-about");
+  var toast = document.getElementById("toast");
+  var toastTimer = null;
+
+  /* ===== 背景视差 ===== */
+  var parallaxOn = true;
+  stage.addEventListener("mousemove", function (e) {
+    if (!parallaxOn) { bg.style.transform = "scale(1.0)"; return; }
+    var nx = e.clientX / window.innerWidth - 0.5;
+    var ny = e.clientY / window.innerHeight - 0.5;
+    bg.style.transform = "translate(" + (nx * -14) + "px," + (ny * -10) + "px) scale(1.04)";
+  });
+  stage.addEventListener("mouseleave", function () {
+    bg.style.transform = "scale(1.0)";
+  });
+
+  /* ===== 粒子：上升火星 ===== */
+  var canvas = document.getElementById("fx");
+  var ctx = canvas.getContext("2d");
+  var particles = [];
+  var particlesOn = true;
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  function spawnParticle() {
+    if (!particlesOn) return;
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: canvas.height + 8,
+      r: 0.6 + Math.random() * 1.8,
+      vy: 0.3 + Math.random() * 0.9,
+      vx: (Math.random() - 0.5) * 0.4,
+      life: 1,
+      decay: 0.0035 + Math.random() * 0.005,
+      hue: 30 + Math.random() * 22
+    });
+  }
+  function drawParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (var i = particles.length - 1; i >= 0; i--) {
+      var p = particles[i];
+      p.y -= p.vy;
+      p.x += p.vx + Math.sin(p.y * 0.01) * 0.2;
+      p.life -= p.decay;
+      if (p.life <= 0) { particles.splice(i, 1); continue; }
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = "hsla(" + p.hue + ", 90%, " + (55 + p.life * 15) + "%, " + (p.life * 0.8) + ")";
+      ctx.shadowColor = "rgba(255, 180, 60, 0.8)";
+      ctx.shadowBlur = 6;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+    requestAnimationFrame(drawParticles);
+  }
+  drawParticles();
+  setInterval(function () {
+    for (var i = 0; i < 2; i++) spawnParticle();
+    if (particles.length > 90) particles.splice(0, particles.length - 90);
+  }, 120);
+
+  /* ===== 键盘 / 鼠标导航焦点 ===== */
+  var focusIdx = -1;
+  var enabled = buttons.filter(function (b) { return !b.classList.contains("disabled"); });
+
+  function setFocus(idx) {
+    buttons.forEach(function (b) { b.classList.remove("focus"); });
+    focusIdx = idx;
+    if (idx >= 0) {
+      var b = buttons[idx];
+      b.classList.add("focus");
+      b.scrollIntoView({ block: "nearest" });
+    }
+  }
+  function focusByMouse(b) {
+    var i = buttons.indexOf(b);
+    setFocus(i);
+  }
+
+  nav.addEventListener("mouseover", function (e) {
+    var b = e.target.closest ? e.target.closest(".btn") : null;
+    if (b && !b.classList.contains("disabled")) { focusByMouse(b); hoverSnd(); }
+  });
+
+  window.addEventListener("keydown", function (e) {
+    var ld = document.getElementById("game-loading");
+    var modalOpen = document.querySelector(".overlay.show") || ld.classList.contains("show");
+    var aboutOpen = aboutPage.classList.contains("show");
+    var debugOpen = debugDrawer.classList.contains("show");
+
+    if (e.key === "Escape") {
+      if (debugOpen) { closeDebugDrawer(); }
+      else if (ld.classList.contains("show")) { hideGame(); }
+      else if (game.classList.contains("show")) { openDebugDrawer(); }
+      else if (aboutOpen) { hideAbout(); }
+      else if (modalOpen) { closeModals(); }
+      else { setFocus(-1); }
+      return;
+    }
+    if (debugOpen) return;
+
+    // 游戏场景内：按 J 测试扣血
+    if (game.classList.contains("show") && (e.key === "j" || e.key === "J")) {
+      e.preventDefault();
+      ensureAudio();
+      takeDamage();
+      return;
+    }
+
+    // 游戏场景内：攻击 —— A/← 左攻击，D/→ 右攻击，S 按住防御，K 朝怪物自动攻击
+    if (game.classList.contains("show")) {
+      if (e.key === "a" || e.key === "A" || e.key === "ArrowLeft") {
+        e.preventDefault(); ensureAudio(); playerAttack(-1); return;
+      }
+      if (e.key === "d" || e.key === "D" || e.key === "ArrowRight") {
+        e.preventDefault(); ensureAudio(); playerAttack(1); return;
+      }
+      if (e.key === "s" || e.key === "S") {
+        e.preventDefault(); ensureAudio();
+        if (!pKeyBlocking) {
+          pKeyBlocking = true;
+          heroStartBlock();
+        }
+        return;
+      }
+      if (e.key === "k" || e.key === "K") {
+        e.preventDefault(); ensureAudio(); playerAttack(); return;
+      }
+    }
+    if (game.classList.contains("show")) return;
+
+    if (modalOpen || aboutOpen) return;
+
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      var dir = e.key === "ArrowDown" ? 1 : -1;
+      var next = focusIdx + dir;
+      if (next < 0) next = buttons.length - 1;
+      if (next > buttons.length - 1) next = 0;
+      setFocus(next);
+      hoverSnd();
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (focusIdx >= 0) activate(buttons[focusIdx]);
+      else setFocus(0);
+    }
+  });
+
+  window.addEventListener("keyup", function (e) {
+    if (e.key === "s" || e.key === "S") {
+      pKeyBlocking = false;
+      syncDefenseState(performance.now());
+    }
+  });
+
+  function clearHeldInputState() {
+    pKeyBlocking = false;
+    if (typeof syncDefenseState === "function") {
+      syncDefenseState(performance.now());
+    }
+  }
+
+  window.addEventListener("blur", clearHeldInputState);
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "hidden") clearHeldInputState();
+  });
+
+  function activate(b) {
+    if (b.classList.contains("disabled")) {
+      showToast("暂无存档，请先开始游戏");
+      beep(300, 0.12, "square", 0.06);
+      return;
+    }
+    ensureAudio(); clickSnd();
+    var action = b.getAttribute("data-action");
+    if (action === "start") startGame();
+    else if (action === "debug") {
+      window.location.href = "debug.html";
+    }
+    else if (action === "settings") openModal("settings");
+    else if (action === "about") showAbout();
+    else if (action === "exit") exitGame();
+  }
+
+  nav.addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest(".btn") : null;
+    if (b) activate(b);
+  });
+
+  /* ===== 弹窗 ===== */
+  function openModal(name) {
+    var ov = document.getElementById("overlay-" + name);
+    if (ov) ov.classList.add("show");
+  }
+  function closeModals() {
+    document.querySelectorAll(".overlay.show").forEach(function (ov) { ov.classList.remove("show"); });
+  }
+  document.querySelectorAll("[data-close]").forEach(function (btn) {
+    btn.addEventListener("click", closeModals);
+  });
+  document.querySelectorAll(".overlay").forEach(function (ov) {
+    ov.addEventListener("click", function (e) {
+      if (e.target === ov) closeModals();
+    });
+  });
+
+  /* ===== 关于页面 ===== */
+  function showAbout() {
+    aboutPage.classList.add("show");
+    setFocus(-1);
+  }
+  function hideAbout() {
+    aboutPage.classList.remove("show");
+  }
+  document.getElementById("about-back").addEventListener("click", hideAbout);
+
+  /* ===== 设置 ===== */
+  var musicSlider = document.getElementById("vol-music");
+  var sfxSlider = document.getElementById("vol-sfx");
+  var valMusic = document.getElementById("val-music");
+  var valSfx = document.getElementById("val-sfx");
+  musicSlider.addEventListener("input", function () {
+    valMusic.textContent = musicSlider.value;
+    updateBackgroundMusicVolume();
+  });
+  sfxSlider.addEventListener("input", function () { valSfx.textContent = sfxSlider.value; sfxVol = sfxSlider.value / 100; });
+
+  var fullBtn = document.getElementById("btn-fullscreen");
+  fullBtn.addEventListener("click", function () {
+    if (!document.fullscreenElement) {
+      var el = document.documentElement;
+      (el.requestFullscreen || el.webkitRequestFullscreen || function () {}).call(el);
+    } else {
+      (document.exitFullscreen || document.webkitExitFullscreen || function () {}).call(document);
+    }
+  });
+  document.addEventListener("fullscreenchange", function () {
+    fullBtn.textContent = document.fullscreenElement ? "退出全屏" : "进入全屏";
+  });
+
+  var pBtn = document.getElementById("btn-particles");
+  pBtn.addEventListener("click", function () {
+    particlesOn = !particlesOn;
+    pBtn.textContent = particlesOn ? "开启" : "关闭";
+    if (!particlesOn) particles = [];
+    showToast(particlesOn ? "粒子效果已开启" : "粒子效果已关闭");
+  });
+
+  /* ===== 开始游戏 / 加载层 ===== */
+  var loading = document.getElementById("game-loading");
+  var fill = document.getElementById("load-fill");
+  var loadingText = loading.querySelector(".ld-text");
+  var loadTimer = null;
+
+  /* ===== 游戏场景：血量 ===== */
+  var game = document.getElementById("game");
+  var cameraWorld = document.getElementById("camera-world");
+  var heartsBox = document.getElementById("hearts");
+  var rageMeter = document.getElementById("rage-meter");
+  var rageTrack = document.getElementById("rage-track");
+  var rageFill = document.getElementById("rage-fill");
+  var rageValue = document.getElementById("rage-value");
+  var rageSlash = document.getElementById("rage-slash");
+  var dmg = document.getElementById("dmg");
+  var gameover = document.getElementById("gameover");
+  var debugDrawer = document.getElementById("debug-drawer");
+  var debugClose = document.getElementById("debug-close");
+  var debugExit = document.getElementById("debug-exit");
+  var inputModeTabs = document.querySelectorAll("[data-game-mode]");
+  var infiniteHpToggle = document.getElementById("infinite-hp");
+  var infiniteHpState = document.getElementById("infinite-hp-state");
+  var GAME_INPUT_MODE_KEY = "soul-rider-game-input-mode";
+  var MAX_HP = 3;
+  var hp = Infinity;
+  var infiniteHp = true;
+  var pcYoloEnabled = true;
+  var currentGameInputMode = "eleven_point";
+  var gameModeRequestId = 0;
+  var gameStartTaskId = 0;
+  var worldFreezeUntil = 0;
+  var worldFreezeTimer = 0;
+  var blockCameraFrame = 0;
+  var rage = 0;
+  var rageFull = false;
+  var rageLastAt = performance.now();
+  var rageSlashTimer = 0;
+  var RAGE_MAX = 100;
+  var RAGE_PER_BLOCK = 35;
+  var RAGE_DECAY_PER_SECOND = 8;
+
+  function openDebugDrawer() {
+    if (!game.classList.contains("show")) return;
+    debugDrawer.classList.add("show");
+    debugDrawer.setAttribute("aria-hidden", "false");
+    debugClose.focus();
+  }
+
+  function closeDebugDrawer() {
+    debugDrawer.classList.remove("show");
+    debugDrawer.setAttribute("aria-hidden", "true");
+  }
+
+  function readGameInputMode() {
+    try {
+      var saved = localStorage.getItem(GAME_INPUT_MODE_KEY);
+      if (saved === "eleven_point" || saved === "yolo") return saved;
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function applyGameInputMode(mode, persist) {
+    currentGameInputMode = mode === "eleven_point" ? "eleven_point" : "yolo";
+    pcYoloEnabled = true;
+    inputModeTabs.forEach(function (tab) {
+      var selected = tab.dataset.gameMode === currentGameInputMode;
+      tab.classList.toggle("active", selected);
+      tab.setAttribute("aria-selected", String(selected));
+    });
+    if (persist) {
+      try {
+        localStorage.setItem(GAME_INPUT_MODE_KEY, currentGameInputMode);
+      } catch (e) {}
+    }
+  }
+
+  async function syncGameInputModeToBridge() {
+    var requestId = ++gameModeRequestId;
+    try {
+      var response = await fetch(CAM.url.replace(/\/state$/, "/api/detection-mode"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode: currentGameInputMode })
+      });
+      return requestId === gameModeRequestId && response.ok;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function updateInfiniteHpState() {
+    infiniteHp = infiniteHpToggle.checked;
+    hp = infiniteHp ? Infinity : MAX_HP;
+    infiniteHpState.textContent = infiniteHp ? "开启" : "关闭";
+    renderHearts();
+  }
+
+  function updateRageUi() {
+    var value = Math.max(0, Math.min(RAGE_MAX, rage));
+    var percent = Math.round(value);
+    rageFill.style.width = value + "%";
+    rageValue.textContent = percent + "%";
+    rageTrack.setAttribute("aria-valuenow", String(percent));
+    rageMeter.classList.toggle("full", rageFull);
+  }
+
+  function gainRageFromBlock() {
+    if (rageFull) return;
+    rage = Math.min(RAGE_MAX, rage + RAGE_PER_BLOCK);
+    rageLastAt = performance.now();
+    if (rage >= RAGE_MAX) {
+      rage = RAGE_MAX;
+      rageFull = true;
+    }
+    updateRageUi();
+  }
+
+  function consumeRageForAttack() {
+    if (!rageFull || rage <= 0) return false;
+    rage = 0;
+    rageFull = false;
+    updateRageUi();
+    return true;
+  }
+
+  function updateRageDecay(now) {
+    if (!rageFull) {
+      rageLastAt = now;
+      return;
+    }
+    var dt = Math.min(0.1, Math.max(0, (now - rageLastAt) / 1000));
+    rageLastAt = now;
+    rage = Math.max(0, rage - RAGE_DECAY_PER_SECOND * dt);
+    if (rage <= 0) {
+      rage = 0;
+      rageFull = false;
+    }
+    updateRageUi();
+  }
+
+  function triggerRageSlash() {
+    clearTimeout(rageSlashTimer);
+    rageSlash.classList.remove("active");
+    void rageSlash.offsetWidth;
+    rageSlash.classList.add("active");
+    rageSlashTimer = setTimeout(function () {
+      rageSlash.classList.remove("active");
+    }, 480);
+  }
+
+  debugClose.addEventListener("click", function () {
+    closeDebugDrawer();
+  });
+  debugDrawer.addEventListener("click", function (e) {
+    if (e.target === debugDrawer) closeDebugDrawer();
+  });
+  debugExit.addEventListener("click", function () {
+    hideGame();
+  });
+  inputModeTabs.forEach(function (tab) {
+    tab.addEventListener("click", function () {
+      if (tab.dataset.gameMode === currentGameInputMode) return;
+      applyGameInputMode(tab.dataset.gameMode, true);
+      syncGameInputModeToBridge();
+    });
+  });
+  infiniteHpToggle.addEventListener("change", function () {
+    updateInfiniteHpState();
+  });
+  window.addEventListener("storage", function (event) {
+    if (event.key === GAME_INPUT_MODE_KEY) {
+      applyGameInputMode(event.newValue, false);
+      syncGameInputModeToBridge();
+    }
+  });
+  applyGameInputMode(readGameInputMode() || "eleven_point", false);
+  infiniteHpState.textContent = infiniteHp ? "开启" : "关闭";
+  updateRageUi();
+
+  function heartSVG(filled) {
+    var s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    s.setAttribute("viewBox", "0 0 24 24");
+    s.setAttribute("class", "heart" + (filled ? "" : " empty"));
+    var gid = "hg" + Math.random().toString(36).slice(2, 7);
+    var defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+    var grad = document.createElementNS("http://www.w3.org/2000/svg", "linearGradient");
+    grad.setAttribute("id", gid);
+    grad.setAttribute("x1", "0"); grad.setAttribute("y1", "0");
+    grad.setAttribute("x2", "0"); grad.setAttribute("y2", "1");
+    var s1 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+    s1.setAttribute("offset", "0");
+    s1.setAttribute("stop-color", filled ? "#ff7d88" : "#5a4a44");
+    var s2 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+    s2.setAttribute("offset", "1");
+    s2.setAttribute("stop-color", filled ? "#d63031" : "#3a2f2a");
+    grad.appendChild(s1); grad.appendChild(s2);
+    defs.appendChild(grad);
+    s.appendChild(defs);
+    var p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    p.setAttribute("d", "M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z");
+    p.setAttribute("fill", "url(#" + gid + ")");
+    p.setAttribute("stroke", filled ? "#7a1f22" : "#241a14");
+    p.setAttribute("stroke-width", "0.8");
+    s.appendChild(p);
+    return s;
+  }
+
+  function renderHearts() {
+    heartsBox.innerHTML = "";
+    for (var i = 0; i < MAX_HP; i++) {
+      heartsBox.appendChild(heartSVG(i < hp));
+    }
+  }
+
+  function takeDamage() {
+    if (gameover.classList.contains("show") || hp <= 0 || infiniteHp) return;
+    hp--;
+    renderHearts();
+    var hearts = heartsBox.children;
+    if (hearts[hp]) hearts[hp].classList.add("pop");
+    dmg.classList.add("on");
+    setTimeout(function () { dmg.classList.remove("on"); }, 140);
+    if (hp <= 0) {
+      heroStartDead();
+      setTimeout(function () { gameover.classList.add("show"); }, 1000);
+    }
+  }
+
+  function resetGame() {
+    hp = infiniteHp ? Infinity : MAX_HP;
+    pInvUntil = 0;
+    pBlockNoticeShown = false;
+    pAttackUntil = 0;
+    pKeyBlocking = false;
+    rage = 0;
+    rageFull = false;
+    rageLastAt = performance.now();
+    clearTimeout(rageSlashTimer);
+    rageSlash.classList.remove("active");
+    updateRageUi();
+    resetBlockCameraImpact();
+    pX = 50; pY = 3;
+    if (typeof CAM !== "undefined") {
+      CAM.bodyAction = "stand";
+      CAM.bodyActionUntil = 0;
+      CAM.lastBodyAction = "stand";
+      CAM.calibrationReady = false;
+      CAM.calibrationState = "idle";
+    }
+    heroReset();
+    renderHearts();
+    gameover.classList.remove("show");
+    applyPlayerPos();
+  }
+
+  document.getElementById("btn-restart").addEventListener("click", function () {
+    resetGame();
+  });
+  document.getElementById("btn-backmenu").addEventListener("click", function () {
+    hideGame();
+  });
+  document.getElementById("btn-attack").addEventListener("click", function () {
+    ensureAudio();
+    playerAttack();
+  });
+
+  function startGame() {
+    var taskId = ++gameStartTaskId;
+    closeDebugDrawer();
+    resetGame();
+    loading.classList.add("show");
+    fill.style.width = "0%";
+    var p = 0;
+    loadTimer = setInterval(function () {
+      p += Math.random() * 18 + 6;
+      if (p >= 100) {
+        p = 100;
+        clearInterval(loadTimer);
+        fill.style.width = "100%";
+        setTimeout(function () { enterScene(taskId); }, 300);
+      } else {
+        fill.style.width = p + "%";
+      }
+    }, 110);
+  }
+
+  async function enterScene(taskId) {
+    if (taskId !== gameStartTaskId) return;
+    closeDebugDrawer();
+    loadingText.textContent = "正在连接姿态输入…";
+    var synced = await syncGameInputModeToBridge();
+    if (taskId !== gameStartTaskId) return;
+    if (synced) await notifyBridgeGame(true);
+    if (taskId !== gameStartTaskId) return;
+    // Startup is bounded. The bridge switches to the current valid pose after
+    // its five-second warm-up, so a missing neutral pose must not trap the UI in
+    // an endless recalibration/splash loop.
+    var cameraReady = await waitForCameraReady(5000, taskId);
+    if (taskId !== gameStartTaskId) return;
+    loadingText.textContent = "正在进入训练场…";
+    loading.classList.remove("show");
+    document.getElementById("menu").classList.add("hidden");
+    game.classList.add("show");
+    startMonster();
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { game.classList.add("fade"); });
+    });
+  }
+
+  function hideGame() {
+    gameStartTaskId += 1;
+    closeDebugDrawer();
+    document.getElementById("menu").classList.remove("hidden");
+    notifyBridgeGame(false);
+    game.classList.remove("fade");
+    game.classList.remove("show");
+    loading.classList.remove("show");
+    clearInterval(loadTimer);
+    fill.style.width = "0%";
+    gameover.classList.remove("show");
+    stopMonster();
+  }
+
+  /* ===== 怪物：牛头人精灵动画 + 随机移动/跳跃/突进 ===== */
+  var monster = document.getElementById("monster");
+  var monsterSprite = document.getElementById("monster-sprite");
+  var monsterShadow = monster.querySelector(".monster-shadow");
+  var MONSTER_ANIMS = {
+    idle: { cells: [[0, 0], [0, 1]], ms: 220 },
+    walk: { cells: [[1, 0], [1, 1], [1, 2], [1, 3]], ms: 120 },
+    windup: {
+      cells: [[0, 0]],
+      ms: 100
+    },
+    attack: { cells: [[2, 0], [2, 1], [2, 2], [2, 3], [2, 4]], ms: 88 }
+  };
+  var monsterAnim = "idle";
+  var monsterFrame = 0;
+  var monsterFrameAt = performance.now();
+
+  // 玩家站位（左下贴地）。接入玩家角色后，把突进目标换成玩家的实时坐标即可
+  var PLAYER = { x: 50, y: 3 };   // 骑士固定在屏幕中央（贴地）
+
+  // 移动状态（位置单位：视口百分比）
+  var mActive = false;
+  var mPos = { x: 56, y: 3 };
+  var mTarget = { x: 56, y: 3 };
+  var mSpeed = 9;         // 普通移动速度（%/秒，调慢）
+  var mPauseUntil = 0;
+  var mLast = null;
+
+  // 特殊行为：跳跃 / 突进攻击
+  var mNextJumpAt = 0;    // 下一次跳跃时间
+  var mNextAttackAt = 0;  // 下一次攻击（突进）时间
+  var mJump = 0;          // 当前跳跃高度（%）
+  var mJumpStart = null;  // 起跳时间戳
+  var mJumpDur = 0;
+  var mJumpPeak = 0;
+  var mDashUntil = 0;     // 突进结束时间
+  var mDashTarget = null;
+  var mDashReached = false;
+  var mDashHitResolved = false;
+  var mForcedExitTarget = null;
+
+  // 攻击 / 死亡
+  var mDying = false;
+  var respawnTimer = null;  // 死亡后重新生成定时器
+
+  // ---- 战斗手感参数（可按需调优）----
+  var DASH_SPEED = 100;        // 实际攻击阶段快速移动到玩家位置
+  var DASH_MS = 700;           // 怪物突进持续时间
+  var WINDUP_MS = 1200;        // 突进前蓄力起手时长（给玩家反应/反击时间）
+  var ATTACK_INTERVAL = 4000;  // 怪物两次攻击（突进）之间的固定间隔（毫秒）
+  var JUMP_MIN = 1500, JUMP_MAX = 3500; // 怪物跳跃的随机间隔范围
+  var MONSTER_HIT_RANGE = 11;  // 怪物突进命中玩家的距离（视口百分比）
+  var ATTACK_LANDING_GAP = MONSTER_HIT_RANGE * 0.45; // 左右落点间距减半，并围绕玩家居中
+  var ATTACK_SETUP_GAP = 20; // 从玩家重合区先走到玩家左右 20% 处再攻击
+  var P_INV_MS = 900;          // 玩家受伤后的无敌时间（毫秒）
+  var pInvUntil = 0;           // 玩家无敌截止时间戳
+  var pBlockNoticeShown = false; // 每次怪物突进只提示一次格挡成功
+  var mWindupUntil = 0;        // 怪物蓄力起手结束时间戳
+
+  // 预加载精灵表，避免首次生成时空白
+  (function preloadMonster() {
+    var im = new Image();
+    im.src = "classic/monster/minotaur_earth.png";
+  })();
+
+  function applyMonsterFrame() {
+    var anim = MONSTER_ANIMS[monsterAnim];
+    var cell = anim.cells[monsterFrame];
+    monsterSprite.style.backgroundPosition = (cell[1] * 25) + "% " + (cell[0] * 50) + "%";
+  }
+
+  function setMonsterAnimation(name, restart) {
+    if (!MONSTER_ANIMS[name]) return;
+    if (monsterAnim === name && !restart) return;
+    monsterAnim = name;
+    monsterFrame = 0;
+    monsterFrameAt = performance.now();
+    applyMonsterFrame();
+  }
+
+  function monsterAnimate(now) {
+    if (now < worldFreezeUntil) {
+      monsterFrameAt = now;
+      requestAnimationFrame(monsterAnimate);
+      return;
+    }
+    var anim = MONSTER_ANIMS[monsterAnim];
+    if (now - monsterFrameAt >= anim.ms) {
+      monsterFrameAt = now;
+      if (monsterAnim !== "attack" || monsterFrame < anim.cells.length - 1) {
+        monsterFrame = (monsterFrame + 1) % anim.cells.length;
+        applyMonsterFrame();
+      }
+    }
+    requestAnimationFrame(monsterAnimate);
+  }
+
+  applyMonsterFrame();
+  requestAnimationFrame(monsterAnimate);
+
+  function applyMonsterPos() {
+    monster.style.left = mPos.x + "%";
+    monster.style.bottom = (mPos.y + mJump) + "%";
+    // 离地越远（含跳跃）阴影越浅越小，浮空时阴影消失
+    var h = mPos.y + mJump;
+    var s = Math.max(0.15, 1 - h / 30);
+    monsterShadow.style.opacity = s;
+    monsterShadow.style.transform = "translateX(-50%) scale(" + (0.5 + 0.5 * s) + ")";
+  }
+
+  function faceMonster(dx) {
+    if (dx > 0.01) monster.classList.remove("flip");
+    else if (dx < -0.01) monster.classList.add("flip");
+  }
+
+  function attackLandingX() {
+    var side;
+    if (mPos.x < PLAYER.x) side = -1;
+    else if (mPos.x > PLAYER.x) side = 1;
+    else side = monster.classList.contains("flip") ? -1 : 1;
+    return Math.max(4, Math.min(96, PLAYER.x + side * ATTACK_LANDING_GAP));
+  }
+
+  function isInsideAttackLandingSpan(x) {
+    return x >= PLAYER.x - ATTACK_LANDING_GAP && x <= PLAYER.x + ATTACK_LANDING_GAP;
+  }
+
+  function chooseAttackExitSide() {
+    if (Math.abs(mPos.x - PLAYER.x) < 0.01) {
+      return monster.classList.contains("flip") ? -1 : 1;
+    }
+    return mPos.x < PLAYER.x ? -1 : 1;
+  }
+
+  function attackSetupX(side) {
+    return Math.max(4, Math.min(96, PLAYER.x + side * ATTACK_SETUP_GAP));
+  }
+
+  function pickTarget() {
+    mTarget.x = 4 + Math.random() * 92; // 4% ~ 96% 横向全屏
+    mTarget.y = 3; // 固定在地面平面，与离线版一致
+  }
+
+  function updateJump(now) {
+    if (mJumpStart === null) { mJump = 0; return; }
+    var t = (now - mJumpStart) / mJumpDur;
+    if (t >= 1) { mJump = 0; mJumpStart = null; }
+    else { mJump = 4 * mJumpPeak * t * (1 - t); } // 抛物线
+  }
+
+  function startJump(now) {
+    if (mJumpStart !== null) return;
+    mJumpStart = now;
+    mJumpDur = 500 + Math.random() * 250;
+    mJumpPeak = 7 + Math.random() * 8; // 峰值高度 7% ~ 15%
+  }
+
+  function startDash(now) {
+    pBlockNoticeShown = false;
+    mWindupUntil = now + WINDUP_MS;   // 先蓄力起手：静止 + 亮红警示
+    mDashUntil = 0;
+    mPauseUntil = 0;
+    mJump = 0;
+    mJumpStart = null;
+    mDashReached = false;
+    mDashHitResolved = false;
+    mDashTarget = { x: attackLandingX(), y: PLAYER.y };
+    faceMonster(mDashTarget.x - mPos.x);
+    setMonsterAnimation("windup", true);
+    monster.classList.add("windup");
+  }
+
+  function scheduleJump(now) {
+    mNextJumpAt = now + JUMP_MIN + Math.random() * (JUMP_MAX - JUMP_MIN);
+  }
+
+  function scheduleAttack(now) {
+    mNextAttackAt = now + ATTACK_INTERVAL;
+  }
+
+  function maybeJump(now) {
+    // 攻击蓄力/突进中不跳，避免与攻击重叠
+    if (now >= mNextJumpAt && now >= mWindupUntil && now >= mDashUntil) {
+      scheduleJump(now);
+      startJump(now);
+    }
+  }
+
+  function maybeAttack(now) {
+    // 攻击带固定冷却：每隔 ATTACK_INTERVAL 才突进一次
+    if (now >= mNextAttackAt) {
+      if (isInsideAttackLandingSpan(mPos.x)) {
+        var exitSide = chooseAttackExitSide();
+        mJump = 0;
+        mJumpStart = null;
+        mForcedExitTarget = { x: attackSetupX(exitSide), y: 3 };
+        faceMonster(mForcedExitTarget.x - mPos.x);
+        setMonsterAnimation("walk");
+        return;
+      }
+      scheduleAttack(now);
+      startDash(now);   // 突进攻击（含蓄力起手式）
+    }
+  }
+
+  function monsterStep(now) {
+    if (!mActive) return;
+    if (now < worldFreezeUntil) {
+      mLast = now;
+      requestAnimationFrame(monsterStep);
+      return;
+    }
+    if (mLast === null) mLast = now;
+    var dt = Math.min(0.05, (now - mLast) / 1000);
+    mLast = now;
+
+    updateJump(now);
+
+    // 若攻击触发时位于玩家重合区，先持续向一侧走出，再进入攻击前摇
+    if (mForcedExitTarget !== null) {
+      var exitDx = mForcedExitTarget.x - mPos.x;
+      var exitDist = Math.abs(exitDx);
+      faceMonster(exitDx);
+      setMonsterAnimation("walk");
+      if (exitDist <= 0.5) {
+        mPos.x = mForcedExitTarget.x;
+        mPos.y = mForcedExitTarget.y;
+        mForcedExitTarget = null;
+        scheduleAttack(now);
+        startDash(now);
+      } else {
+        var exitStep = Math.min(mSpeed * dt, exitDist);
+        mPos.x += Math.sign(exitDx) * exitStep;
+      }
+      applyMonsterPos();
+      requestAnimationFrame(monsterStep);
+      return;
+    }
+
+    // 突进攻击的蓄力起手式：静止并亮红，给玩家反应/反击窗口
+    if (now < mWindupUntil) {
+      setMonsterAnimation("windup");
+      applyMonsterPos();
+      requestAnimationFrame(monsterStep);
+      return;
+    }
+    if (mWindupUntil !== 0) {
+      mWindupUntil = 0;
+      monster.classList.remove("windup");
+      mDashUntil = now + DASH_MS;
+      setMonsterAnimation("attack", true);
+    }
+
+    maybeAttack(now);
+    maybeJump(now);
+    if (mForcedExitTarget !== null) {
+      setMonsterAnimation("walk");
+      applyMonsterPos();
+      requestAnimationFrame(monsterStep);
+      return;
+    }
+    if (now < mWindupUntil) {
+      setMonsterAnimation("windup");
+      applyMonsterPos();
+      requestAnimationFrame(monsterStep);
+      return;
+    }
+
+    var wasDashing = mDashUntil !== 0;
+    var dashing = now < mDashUntil;
+    if (wasDashing && !dashing) {
+      mDashUntil = 0;
+      mDashReached = false;
+      mDashHitResolved = false;
+      mPauseUntil = now + 700 + Math.random() * 700;
+      pickTarget();
+    }
+    monster.classList.toggle("dash", dashing);
+
+    if (!dashing && now < mPauseUntil) {
+      setMonsterAnimation("idle");
+      applyMonsterPos();
+      requestAnimationFrame(monsterStep);
+      return;
+    }
+
+    var tx = dashing ? mDashTarget.x : mTarget.x;
+    var ty = dashing ? mDashTarget.y : mTarget.y;
+    var spd = dashing ? DASH_SPEED : mSpeed;
+    faceMonster(tx - mPos.x);
+    setMonsterAnimation(dashing ? "attack" : "walk");
+
+    var dx = tx - mPos.x;
+    var dy = ty - mPos.y;
+    var dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (dashing && mDashReached) {
+      mPos.x = tx;
+      mPos.y = ty;
+    } else if (dist < 0.5) {
+      mPos.x = tx; mPos.y = ty;
+      if (dashing) {
+        mDashReached = true;
+      } else {
+        mPauseUntil = now + 400 + Math.random() * 1300;
+        pickTarget();
+      }
+    } else {
+      var step = Math.min(spd * dt, dist);
+      mPos.x += (dx / dist) * step;
+      mPos.y += (dy / dist) * step;
+      if (step >= dist && dashing) mDashReached = true;
+    }
+    if (dashing && !mDashHitResolved) {
+      mDashHitResolved = hitCheckPlayer(now);
+    }
+    applyMonsterPos();
+    requestAnimationFrame(monsterStep);
+  }
+
+  function attackMonster(dir) {
+    if (!mActive || mDying) {
+      return { ok: false, reason: "no_monster" };
+    }
+    if (isDefenseActive(performance.now())) {
+      return { ok: false, reason: "defense_active" };
+    }
+    var dx = mPos.x - pX;
+    // 方向判定：dir=-1 只打左边、+1 只打右边；未指定则朝怪物自动判断
+    var side = (dir === -1 || dir === 1) ? dir : (dx < 0 ? -1 : 1);
+    if ((side === -1 && dx >= 0) || (side === 1 && dx <= 0)) {
+      showToast(side === -1 ? "左边没有怪物" : "右边没有怪物");
+      return { ok: false, reason: "monster_on_other_side", side: side };
+    }
+    killMonster();
+    return { ok: true, reason: "monster_hit", side: side };
+  }
+
+  function resetBlockCameraImpact() {
+    worldFreezeUntil = 0;
+    clearTimeout(worldFreezeTimer);
+    if (blockCameraFrame) {
+      cancelAnimationFrame(blockCameraFrame);
+      blockCameraFrame = 0;
+    }
+    cameraWorld.classList.remove("world-frozen");
+    cameraWorld.style.transform = "";
+    cameraWorld.style.transformOrigin = "50% 50%";
+  }
+
+  function triggerBlockCameraImpact(now) {
+    var worldRect = cameraWorld.getBoundingClientRect();
+    var playerRect = playerEl.getBoundingClientRect();
+    var monsterRect = monster.getBoundingClientRect();
+    if (!worldRect.width || !worldRect.height) return;
+
+    var playerX = playerRect.left + playerRect.width / 2 - worldRect.left;
+    var playerY = playerRect.top + playerRect.height / 2 - worldRect.top;
+    var monsterX = monsterRect.left + monsterRect.width / 2 - worldRect.left;
+    var monsterY = monsterRect.top + monsterRect.height / 2 - worldRect.top;
+    var contactX = (playerX + monsterX) / 2;
+    var contactY = (playerY + monsterY) / 2;
+    var directionX = playerX - monsterX;
+    var directionY = (playerY - monsterY) * 0.35;
+    var directionLength = Math.sqrt(directionX * directionX + directionY * directionY);
+    if (directionLength < 0.001) {
+      directionX = 1;
+      directionY = 0;
+      directionLength = 1;
+    }
+    directionX /= directionLength;
+    directionY /= directionLength;
+
+    worldFreezeUntil = now + 45;
+    cameraWorld.classList.add("world-frozen");
+    clearTimeout(worldFreezeTimer);
+    worldFreezeTimer = setTimeout(function () {
+      cameraWorld.classList.remove("world-frozen");
+    }, 45);
+
+    if (blockCameraFrame) cancelAnimationFrame(blockCameraFrame);
+    var startedAt = now;
+    cameraWorld.style.transformOrigin = contactX + "px " + contactY + "px";
+    cameraWorld.style.transform =
+      "translate3d(" + (directionX * 6).toFixed(2) + "px," +
+      (directionY * 6).toFixed(2) + "px,0) scale(1.025)";
+
+    function cameraStep(timestamp) {
+      var elapsed = Math.max(0, timestamp - startedAt);
+      if (elapsed >= 45) {
+        cameraWorld.classList.remove("world-frozen");
+      }
+      var kickProgress = Math.min(1, elapsed / 70);
+      var kickStrength = Math.pow(1 - kickProgress, 2);
+      var zoomProgress = Math.min(1, elapsed / 140);
+      var zoomEase = 1 - Math.pow(1 - zoomProgress, 3);
+      var scale = 1.025 - 0.025 * zoomEase;
+      var offsetX = directionX * 6 * kickStrength;
+      var offsetY = directionY * 6 * kickStrength;
+      cameraWorld.style.transform =
+        "translate3d(" + offsetX.toFixed(2) + "px," +
+        offsetY.toFixed(2) + "px,0) scale(" + scale.toFixed(4) + ")";
+
+      if (elapsed >= 140) {
+        blockCameraFrame = 0;
+        cameraWorld.style.transform = "";
+        cameraWorld.style.transformOrigin = "50% 50%";
+        return;
+      }
+      blockCameraFrame = requestAnimationFrame(cameraStep);
+    }
+
+    blockCameraFrame = requestAnimationFrame(cameraStep);
+  }
+
+  // 怪物突进撞到玩家 → 玩家受伤（带无敌帧，避免一次突进连扣多次）
+  function hitCheckPlayer(now) {
+    if (gameover.classList.contains("show") || hp <= 0) return true;
+    var dx = mPos.x - pX;
+    var dy = (mPos.y + mJump) - pY;
+    if (dx * dx + dy * dy < MONSTER_HIT_RANGE * MONSTER_HIT_RANGE) {
+      if (isDefenseActive(now)) {
+        if (!pBlockNoticeShown) {
+          pBlockNoticeShown = true;
+          showToast("格挡成功");
+          playGameSfx(defenseSfx);
+          triggerBlockCameraImpact(now);
+          gainRageFromBlock();
+        }
+        return true;
+      }
+      if (now < pInvUntil) return true;
+      pInvUntil = now + P_INV_MS;
+      takeDamage();
+      return true;
+    }
+    return false;
+  }
+
+  function killMonster() {
+    if (!mActive || mDying) return;
+    mDying = true;
+    mActive = false;
+    mJump = 0; mJumpStart = null;
+    mDashUntil = 0;
+    mDashReached = false;
+    mDashHitResolved = false;
+    mForcedExitTarget = null;
+    mWindupUntil = 0;
+    monster.classList.remove("dash", "windup");
+    setMonsterAnimation("idle", true);
+    monster.classList.add("dying");
+    respawnTimer = setTimeout(function () {
+      mDying = false;
+      startMonster();
+    }, 1750);
+  }
+
+  function startMonster() {
+    stopMonster();
+    // 生成（弹性放大淡入）
+    monster.classList.remove("alive");
+    void monster.offsetWidth; // 强制回流，让生成动画每次都能重新播放
+    monster.classList.add("alive");
+    // 移动 + 特殊行为
+    mPos.x = 56; mPos.y = 3;
+    faceMonster(PLAYER.x - mPos.x);
+    setMonsterAnimation("idle", true);
+    mJump = 0; mJumpStart = null;
+    mDashUntil = 0; mDashTarget = null;
+    mDashReached = false;
+    mDashHitResolved = false;
+    mForcedExitTarget = null;
+    mWindupUntil = 0;
+    monster.classList.remove("windup");
+    applyMonsterPos();
+    pickTarget();
+    mActive = true;
+    mLast = null;
+    mPauseUntil = performance.now() + 700;
+    scheduleAttack(performance.now());
+    scheduleJump(performance.now());
+    requestAnimationFrame(monsterStep);
+  }
+
+  function stopMonster() {
+    mActive = false;
+    mDying = false;
+    pBlockNoticeShown = false;
+    mDashReached = false;
+    mDashHitResolved = false;
+    mForcedExitTarget = null;
+    if (respawnTimer) { clearTimeout(respawnTimer); respawnTimer = null; }
+    resetBlockCameraImpact();
+    monster.classList.remove("dash", "windup", "dying", "alive");
+  }
+
+  /* ===== 玩家（骑士）：摄像头 / 键盘驱动 ===== */
+  var playerEl = document.getElementById("player");
+  var pX = PLAYER.x, pY = PLAYER.y;      // 固定位置（居中，视口百分比）
+  var pFacing = 1;                       // 1 = 右，-1 = 左
+  var pAttackUntil = 0;                  // 攻击冷却
+
+  /* ===== 英雄骑士 sprite =====
+     沿用离线版帧数与时序：待机 8 帧 / 110ms，攻击 6 帧 / 70ms，
+     防御 8 帧 / 110ms，阵亡 10 帧 / 90ms。 */
+  var playerSprite = document.getElementById("player-sprite");
+  var hudPose = document.getElementById("hud-pose");
+  var HERO_FRAMES = { idle: 8, attack: 6, block: 8, dead: 10 };
+  var HERO_FRAME_MS = { idle: 110, attack: 70, block: 110, dead: 90 };
+  var HERO_SRC_PREFIX = { idle: "idle", attack: "attack", block: "blockidle", dead: "death" };
+  var HERO_STATE_LABEL = { idle: "待机", attack: "攻击", block: "防御", dead: "阵亡" };
+  var heroFrames = {};
+
+  function heroImg(src) {
+    if (!heroFrames[src]) {
+      var im = new Image();
+      im.src = src;
+      heroFrames[src] = im;
+    }
+    return heroFrames[src];
+  }
+
+  (function preloadHero() {
+    Object.keys(HERO_FRAMES).forEach(function (state) {
+      for (var i = 0; i < HERO_FRAMES[state]; i++) {
+        heroImg("classic/hero/" + HERO_SRC_PREFIX[state] + "_" + i + ".png");
+      }
+    });
+  })();
+
+  var pState = "idle";
+  var pFrame = 0;
+  var pFrameAt = performance.now();
+  var pFrameDur = HERO_FRAME_MS.idle;
+  var pKeyBlocking = false;
+
+  function heroSrc() {
+    return "classic/hero/" + HERO_SRC_PREFIX[pState] + "_" + pFrame + ".png";
+  }
+  function heroSetHud() {
+    if (!hudPose) return;
+    var text = hudPose.querySelector(".cam-txt");
+    if (text) text.textContent = "动作 · " + HERO_STATE_LABEL[pState];
+  }
+  function heroRefreshSprite() {
+    if (playerSprite) playerSprite.src = heroSrc();
+  }
+  function heroReset() {
+    pState = "idle";
+    pFrame = 0;
+    pFrameAt = performance.now();
+    pFrameDur = HERO_FRAME_MS.idle;
+    pFacing = 1;
+    heroRefreshSprite();
+    heroSetHud();
+    applyPlayerPos();
+  }
+  function heroStartAttack(dir) {
+    if (pState === "dead") return;
+    pFacing = dir;
+    pState = "attack";
+    pFrame = 0;
+    pFrameAt = performance.now();
+    pFrameDur = HERO_FRAME_MS.attack;
+    heroRefreshSprite();
+    heroSetHud();
+  }
+  function heroStartDead() {
+    pState = "dead";
+    pFrame = 0;
+    pFrameAt = performance.now();
+    pFrameDur = HERO_FRAME_MS.dead;
+    heroRefreshSprite();
+    heroSetHud();
+  }
+  function heroStartBlock() {
+    if (pState === "dead" || pState === "block") return;
+    pState = "block";
+    pFrame = 0;
+    pFrameAt = performance.now();
+    pFrameDur = HERO_FRAME_MS.block;
+    heroRefreshSprite();
+    heroSetHud();
+  }
+  function heroEndBlock() {
+    if (pState !== "block") return;
+    pState = "idle";
+    pFrame = 0;
+    pFrameAt = performance.now();
+    pFrameDur = HERO_FRAME_MS.idle;
+    heroRefreshSprite();
+    heroSetHud();
+  }
+  function heroTick(now) {
+    if (now < worldFreezeUntil) {
+      pFrameAt = now;
+      requestAnimationFrame(heroTick);
+      return;
+    }
+    if (now - pFrameAt >= pFrameDur) {
+      pFrameAt = now;
+      if (pState === "attack") {
+        pFrame++;
+        if (pFrame >= HERO_FRAMES.attack) {
+          pState = "idle";
+          pFrame = 0;
+          pFrameDur = HERO_FRAME_MS.idle;
+          heroSetHud();
+        }
+        heroRefreshSprite();
+      } else if (pState === "dead") {
+        if (pFrame < HERO_FRAMES.dead - 1) {
+          pFrame++;
+          heroRefreshSprite();
+        }
+      } else if (pState === "block") {
+        pFacing = (mPos.x < pX) ? -1 : 1;
+        pFrame = (pFrame + 1) % HERO_FRAMES.block;
+        heroRefreshSprite();
+      } else {
+        pFrame = (pFrame + 1) % HERO_FRAMES.idle;
+        heroRefreshSprite();
+      }
+    }
+    requestAnimationFrame(heroTick);
+  }
+  // 摄像头桥接（bridge.py）状态
+  var CAM = {
+    url: (location.protocol === "http:" || location.protocol === "https:")
+      ? location.origin + "/state"
+      : "http://127.0.0.1:8765/state",
+    ok: false,
+    present: false,
+    lastLeftSeq: 0,
+    lastRightSeq: 0,
+    lastActionSeq: null,
+    lastPoseId: null,
+    lastFrameSeq: 0,
+    pendingFrameSeq: 0,
+    frameRequestAt: 0,
+    frameRetryAt: 0,
+    lastImageAt: 0,
+    polling: false,
+    sessionId: null,
+    logSessionId: null,
+    logEnded: false,
+    lastLoggedRecognition: "",
+    pollErrorLogged: false,
+    calibrationReady: false,
+    calibrationState: "idle",
+    bodyAction: "stand",
+    bodyActionUntil: 0,
+    lastBodyAction: "stand"
+  };
+  var hudCam = document.getElementById("hud-cam");
+  var camImg = document.getElementById("cam-img");
+  var camFrameUrl = CAM.url.replace(/\/state$/, "/frame.png");
+  var camPoll = 0;
+
+  function bridgeEndpoint(path) {
+    return CAM.url.replace(/\/state$/, path);
+  }
+
+  async function syncInitialGameModeFromBridge() {
+    if (readGameInputMode() !== null) return;
+    try {
+      var response = await fetch(CAM.url, { cache: "no-store" });
+      var state = await response.json();
+      if (state.detection_mode === "yolo" ||
+          state.detection_mode === "eleven_point") {
+        applyGameInputMode(state.detection_mode, false);
+      }
+    } catch (_) {}
+  }
+
+  function logGameEvent(event, data) {
+    if (!CAM.logSessionId || CAM.logEnded) return;
+    fetch(bridgeEndpoint("/api/log/game"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      keepalive: true,
+      body: JSON.stringify({
+        event: event,
+        log_session_id: CAM.logSessionId,
+        client_ts: new Date().toISOString(),
+        client_perf_ms: performance.now(),
+        data: data || {}
+      })
+    }).catch(function () {});
+  }
+
+  async function attachGameLogSession() {
+    try {
+      var response = await fetch(bridgeEndpoint("/api/session/attach"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "{}"
+      });
+      var result = await response.json();
+      if (result.ok && typeof result.test_session_id === "number") {
+        CAM.logSessionId = result.test_session_id;
+        CAM.logEnded = false;
+        logGameEvent("page_attached", {
+          page: location.href,
+          user_agent: navigator.userAgent,
+          visibility: document.visibilityState
+        });
+      }
+    } catch (e) {}
+  }
+
+  function endGameLogSession(reason) {
+    notifyBridgeGame(false);
+    if (CAM.logEnded) return;
+    CAM.logEnded = true;
+    if (!CAM.logSessionId) return;
+    fetch(bridgeEndpoint("/api/session/end"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      keepalive: true,
+      body: JSON.stringify({
+        session_id: CAM.logSessionId,
+        reason: reason,
+        client_ts: new Date().toISOString()
+      })
+    }).catch(function () {});
+  }
+
+  window.addEventListener("pagehide", function () {
+    endGameLogSession("webpage_closed");
+  });
+  attachGameLogSession();
+  syncInitialGameModeFromBridge();
+
+  if (camImg) {
+    camImg.addEventListener("load", function () {
+      if (CAM.pendingFrameSeq) {
+        CAM.lastFrameSeq = CAM.pendingFrameSeq;
+      }
+      CAM.pendingFrameSeq = 0;
+      CAM.lastImageAt = performance.now();
+    });
+    camImg.addEventListener("error", function () {
+      CAM.pendingFrameSeq = 0;
+      CAM.frameRetryAt = performance.now() + 250;
+    });
+  }
+
+  function notifyBridgeGame(active) {
+    var endpoint = CAM.url.replace(/\/state$/, active ? "/api/game-start" : "/api/game-stop");
+    return fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{}"
+    }).then(function (response) {
+      return response.ok;
+    }).catch(function () {
+      return false;
+    });
+  }
+
+  async function waitForCameraReady(timeoutMs, taskId) {
+    var startedAt = performance.now();
+    while (performance.now() - startedAt < timeoutMs) {
+      if (taskId !== gameStartTaskId) return false;
+      try {
+        var state = await (await fetch(CAM.url, { cache: "no-store" })).json();
+        var usable =
+          state.ok &&
+          state.detection_mode === currentGameInputMode &&
+          state.calibration_ready === true &&
+          typeof state.frame_seq === "number" &&
+          state.frame_seq > 0;
+        if (state.calibration_state) {
+          var calibrationLabels = {
+            ready: "校准完成，正在进入训练场…",
+            collecting: "正在校准，请保持双手自然下垂…",
+            waiting_for_person: "等待人体进入画面并保持中立姿势…",
+            waiting_for_neutral: "请恢复双手自然下垂的中立姿势…",
+            timeout: "正在等待可用的人体姿态…",
+            stream_lost: "等待姿态数据恢复…"
+          };
+          var calibrationReason =
+            state.calibration && state.calibration.reason;
+          var reasonLabels = {
+            pose_outlier_skipped:
+              "检测到单帧骨架抖动，正在保持校准进度…",
+            pose_position_jump: "骨架位置突然变化，等待恢复稳定…",
+            pose_not_stable: "骨架持续抖动，正在等待稳定…",
+            implausible_shoulder_width: "肩宽变化异常，正在等待稳定…",
+            implausible_body_height: "人体高度异常，请调整站位…",
+            low_required_point_score: "关键点分数不足，请调整站位…",
+            arms_not_neutral: "请恢复双手自然下垂…",
+            insufficient_frames: "正在收集有效骨架帧…",
+            body_motion_detected: "检测到身体运动，请保持站立…",
+            pose_temporarily_invalid: "姿态短暂异常，正在等待恢复…",
+            no_person: "没有检测到人体…",
+            action_started: "已检测到动作，正在进入游戏…",
+            timeout_auto_ready: "已使用当前姿态进入游戏…",
+            neutral_confirmed: "校准完成，正在进入训练场…"
+          };
+          loadingText.textContent = reasonLabels[calibrationReason] ||
+            calibrationLabels[state.calibration_state] ||
+            "等待姿态校准完成…";
+        }
+        if (usable) return true;
+      } catch (e) {
+        // Keep polling until the bounded startup deadline.
+      }
+      await new Promise(function (resolve) { setTimeout(resolve, 100); });
+    }
+    return false;
+  }
+
+  function applyPlayerPos() {
+    playerEl.style.left = pX + "%";
+    playerEl.style.bottom = pY + "%";
+    playerEl.style.transform = "translateX(-50%)" + (pFacing < 0 ? " scaleX(-1)" : "");
+  }
+
+  function isCameraDefenseActive(now) {
+    return (
+      pcYoloEnabled &&
+      CAM.bodyAction === "squat" &&
+      now < CAM.bodyActionUntil
+    );
+  }
+  function isDefenseActive(now) {
+    return pKeyBlocking || isCameraDefenseActive(now);
+  }
+  function syncDefenseState(now) {
+    if (pState === "dead") return;
+    if (isDefenseActive(now)) heroStartBlock();
+    else heroEndBlock();
+  }
+
+  function playerAttack(dir, overhead, fromCamera, eventInfo) {
+    var now = performance.now();
+    var context = eventInfo || {};
+    function reject(reason) {
+      if (fromCamera) {
+        logGameEvent("attack_blocked", {
+          stage: "game_player_attack",
+          reason: reason,
+          action_seq: context.action_seq,
+          trigger_action: context.trigger_action,
+          game_visible: game.classList.contains("show"),
+          player_state: pState,
+          defense_active: isDefenseActive(now)
+        });
+      }
+      return { ok: false, reason: reason };
+    }
+    if (!game.classList.contains("show")) return reject("game_not_visible");
+    if (fromCamera && !CAM.calibrationReady) {
+      return reject("pose_not_calibrated");
+    }
+    if (pState === "dead" || isDefenseActive(now)) {
+      return reject(pState === "dead" ? "player_dead" : "defense_active");
+    }
+    if (now < pAttackUntil) return reject("attack_cooldown");
+    var empoweredAttack = consumeRageForAttack();
+    pAttackUntil = now + 420;
+    // 面向攻击方向（未指定则朝怪物自动判断）
+    pFacing = (dir === -1 || dir === 1) ? dir : (mPos.x < pX ? -1 : 1);
+    ensureAudio();
+    playGameSfx(empoweredAttack ? empoweredSlashSfx : attackSfx);
+    heroStartAttack(pFacing);
+    if (empoweredAttack) {
+      applyPlayerPos();
+      triggerRageSlash();
+    }
+    var hit = attackMonster(dir);
+    if (fromCamera) {
+      logGameEvent("attack_started", {
+        stage: "game_player_attack",
+        action_seq: context.action_seq,
+        trigger_action: context.trigger_action,
+        direction: pFacing,
+        overhead: !!overhead,
+        empowered: empoweredAttack,
+        player_state: pState,
+        hit: hit
+      });
+    }
+    return { ok: true, reason: "attack_started", hit: hit };
+  }
+
+  function playerStep(now) {
+    if (game.classList.contains("show")) {
+      updateRageDecay(now);
+      syncDefenseState(now);
+      PLAYER.x = pX; PLAYER.y = pY;
+      applyPlayerPos();
+    }
+    requestAnimationFrame(playerStep);
+  }
+
+  function pollCamera() {
+    if (CAM.polling) return;
+    CAM.polling = true;
+    var controller = new AbortController();
+    var timeout = setTimeout(function () { controller.abort(); }, 1500);
+    fetch(CAM.url, { cache: "no-store", signal: controller.signal })
+      .then(function (r) { return r.json(); })
+      .then(function (s) {
+        if (CAM.pollErrorLogged) {
+          CAM.pollErrorLogged = false;
+          logGameEvent("bridge_poll_recovered", {});
+        }
+        if (typeof s.session_id === "number" && s.session_id !== CAM.sessionId) {
+          CAM.sessionId = s.session_id;
+          CAM.lastLeftSeq = 0;
+          CAM.lastRightSeq = 0;
+          CAM.lastActionSeq = null;
+          CAM.lastPoseId = null;
+          CAM.lastFrameSeq = 0;
+          CAM.lastLoggedRecognition = "";
+          CAM.pollErrorLogged = false;
+          CAM.pendingFrameSeq = 0;
+          CAM.frameRequestAt = 0;
+          CAM.frameRetryAt = 0;
+          CAM.lastImageAt = 0;
+          CAM.bodyAction = "stand";
+          CAM.bodyActionUntil = 0;
+          CAM.lastBodyAction = "stand";
+          CAM.calibrationReady = false;
+          CAM.calibrationState = "idle";
+        }
+        // The bridge resets action counters when a new training session starts.
+        // Do not keep a pre-game counter and silently ignore the new lower seqs.
+        if (
+          typeof s.action_seq === "number" &&
+          CAM.lastActionSeq !== null &&
+          s.action_seq < CAM.lastActionSeq
+        ) {
+          CAM.lastActionSeq = null;
+        }
+        if (
+          typeof s.left_seq === "number" &&
+          s.left_seq < CAM.lastLeftSeq
+        ) {
+          CAM.lastLeftSeq = 0;
+        }
+        if (
+          typeof s.right_seq === "number" &&
+          s.right_seq < CAM.lastRightSeq
+        ) {
+          CAM.lastRightSeq = 0;
+        }
+        var ok = !!s.ok && !s.err;
+        CAM.ok = ok;
+        CAM.calibrationReady = s.calibration_ready === true;
+        CAM.calibrationState = s.calibration_state || "unknown";
+        CAM.present = (typeof s.fg_ratio === "number") && s.fg_ratio > 0.004;
+        var now = performance.now();
+        var recognitionKey = [
+          s.ok,
+          s.err,
+          s.action,
+          s.attack_action,
+          s.body_action,
+          s.attack_gated,
+          s.reason,
+          s.calibration_ready,
+          s.calibration_state
+        ].join("|");
+        if (recognitionKey !== CAM.lastLoggedRecognition) {
+          CAM.lastLoggedRecognition = recognitionKey;
+          logGameEvent("action_recognized", {
+            action: s.action,
+            action_name: s.action_name,
+            attack_action: s.attack_action,
+            body_action: s.body_action,
+            reason: s.reason,
+            err: s.err,
+            ok: s.ok,
+            present: s.present,
+            attack_gated: !!s.attack_gated,
+            stream_healthy: s.stream_healthy,
+            frame_seq: s.frame_seq,
+            fpga_seq: s.fpga_seq,
+            action_seq: s.action_seq,
+            detection_mode: s.detection_mode,
+            calibration_ready: !!s.calibration_ready,
+            calibration_state: s.calibration_state
+          });
+          if (s.attack_gated && s.attack_action &&
+              s.attack_action !== "stand") {
+            logGameEvent("attack_blocked", {
+              stage: "bridge_state",
+              reason: s.reason || "attack_gated",
+              attack_action: s.attack_action,
+              body_action: s.body_action,
+              frame_seq: s.frame_seq,
+              fpga_seq: s.fpga_seq
+            });
+          }
+        }
+        var bodyAction = s.body_action === "squat"
+          ? s.body_action
+          : "stand";
+        if (pcYoloEnabled && bodyAction !== "stand") {
+          CAM.bodyAction = bodyAction;
+          CAM.bodyActionUntil = now + 280;
+        } else if (now >= CAM.bodyActionUntil) {
+          CAM.bodyAction = "stand";
+          CAM.bodyActionUntil = 0;
+        }
+        if (bodyAction !== CAM.lastBodyAction) {
+          CAM.lastBodyAction = bodyAction;
+          if (pcYoloEnabled && bodyAction === "squat") {
+            pAttackUntil = 0;
+          }
+        }
+        if (typeof s.left_seq === "number" && s.left_seq > CAM.lastLeftSeq) {
+          CAM.lastLeftSeq = s.left_seq;
+          var leftEvent = {
+            event_type: "left_seq",
+            left_seq: s.left_seq,
+            action_seq: s.action_seq,
+            trigger_action: "left",
+            game_visible: game.classList.contains("show"),
+            pc_yolo_enabled: pcYoloEnabled
+          };
+          logGameEvent("game_received", leftEvent);
+          if (pcYoloEnabled && game.classList.contains("show")) {
+            playerAttack(1, false, true, leftEvent);
+          } else {
+            logGameEvent("attack_blocked", {
+              stage: "game_event_dispatch",
+              reason: pcYoloEnabled ? "game_not_visible" : "pc_yolo_disabled",
+              event_type: "left_seq",
+              left_seq: s.left_seq
+            });
+          }
+        }
+        if (typeof s.right_seq === "number" && s.right_seq > CAM.lastRightSeq) {
+          CAM.lastRightSeq = s.right_seq;
+          var rightEvent = {
+            event_type: "right_seq",
+            right_seq: s.right_seq,
+            action_seq: s.action_seq,
+            trigger_action: "right",
+            game_visible: game.classList.contains("show"),
+            pc_yolo_enabled: pcYoloEnabled
+          };
+          logGameEvent("game_received", rightEvent);
+          if (pcYoloEnabled && game.classList.contains("show")) {
+            playerAttack(-1, false, true, rightEvent);
+          } else {
+            logGameEvent("attack_blocked", {
+              stage: "game_event_dispatch",
+              reason: pcYoloEnabled ? "game_not_visible" : "pc_yolo_disabled",
+              event_type: "right_seq",
+              right_seq: s.right_seq
+            });
+          }
+        }
+        // 图片输入模式：每张图最多触发一次离散动作，避免 1 秒显示期间重复攻击。
+        if (typeof s.action_seq === "number" && s.action_seq > 0 &&
+            (CAM.lastActionSeq === null || s.action_seq > CAM.lastActionSeq)) {
+          CAM.lastActionSeq = s.action_seq;
+          var triggeredAction = s.trigger_action || s.action;
+          var actionEvent = {
+            event_type: "action_seq",
+            action_seq: s.action_seq,
+            trigger_action: triggeredAction,
+            action: s.action,
+            body_action: s.body_action,
+            attack_gated: !!s.attack_gated,
+            reason: s.reason,
+            frame_seq: s.frame_seq,
+            fpga_seq: s.fpga_seq,
+            game_visible: game.classList.contains("show"),
+            pc_yolo_enabled: pcYoloEnabled
+          };
+          logGameEvent("game_received", actionEvent);
+          if (pcYoloEnabled && game.classList.contains("show")) {
+            // The FPGA camera image is mirrored relative to the game controls.
+            if (triggeredAction === "left") {
+              playerAttack(1, false, true, actionEvent);
+            } else if (triggeredAction === "right") {
+              playerAttack(-1, false, true, actionEvent);
+            } else if (triggeredAction === "left_overhead") {
+              playerAttack(1, true, true, actionEvent);
+            } else if (triggeredAction === "right_overhead") {
+              playerAttack(-1, true, true, actionEvent);
+            } else {
+              logGameEvent("attack_blocked", {
+                stage: "game_event_dispatch",
+                reason: "unmapped_trigger_action",
+                trigger_action: triggeredAction,
+                action_seq: s.action_seq
+              });
+            }
+          } else {
+            logGameEvent("attack_blocked", {
+              stage: "game_event_dispatch",
+              reason: pcYoloEnabled ? "game_not_visible" : "pc_yolo_disabled",
+              trigger_action: triggeredAction,
+              action_seq: s.action_seq
+            });
+          }
+        }
+        if (hudCam) {
+          hudCam.classList.toggle(
+            "on",
+            ok && pcYoloEnabled && CAM.calibrationReady
+          );
+          var t = hudCam.querySelector(".cam-txt");
+          if (t) {
+            if (!pcYoloEnabled) {
+              t.textContent = "YOLO 推理已关闭 · 等待骨架坐标";
+            } else if (CAM.calibrationState === "stream_lost") {
+              t.textContent = "等待 FPGA 数据流 · 请检查 FT232H 连接";
+            } else if (!CAM.calibrationReady) {
+              t.textContent = "等待姿态校准 · 请保持双手下垂";
+            } else if (ok && s.source_mode === "ft232h") {
+              t.textContent =
+                (s.detection_mode === "eleven_point"
+                  ? "FPGA 11点 · kind5"
+                  : "FPGA 640×360 · kind3") +
+                " · " +
+                (s.action_name || "站立");
+            } else if (ok) {
+              t.textContent = "图片 " + (s.index || 0) + "/" + (s.total || 0) + " · " + (s.action_name || "站立");
+            } else if (s.source_mode === "ft232h") {
+              t.textContent = currentGameInputMode === "eleven_point"
+                ? "等待 FPGA 11点 · kind5"
+                : "等待 FPGA 640×360 · kind3";
+            } else {
+              t.textContent = "图片输入未连接";
+            }
+          }
+          var none = document.getElementById("cam-view").querySelector(".cam-none");
+          if (!pcYoloEnabled) {
+            CAM.lastFrameSeq = 0;
+            if (camImg) camImg.style.display = "none";
+            if (none) {
+              none.textContent = "骨架坐标模式 · YOLO 已关闭";
+              none.style.display = "block";
+            }
+          } else if (ok && camImg && typeof s.frame_seq === "number") {
+            var nowFrame = performance.now();
+            if (
+              s.frame_seq !== CAM.lastFrameSeq &&
+              s.frame_seq !== CAM.pendingFrameSeq &&
+              nowFrame >= CAM.frameRetryAt
+            ) {
+              CAM.pendingFrameSeq = s.frame_seq;
+              CAM.frameRequestAt = nowFrame;
+              camImg.src = camFrameUrl + "?t=" + Date.now();
+              camImg.style.display = "block";
+              if (none) none.style.display = "none";
+            }
+            var imageStalled =
+              CAM.pendingFrameSeq &&
+              nowFrame - CAM.frameRequestAt > 1800;
+            var imageAged =
+              CAM.lastImageAt &&
+              nowFrame - CAM.lastImageAt > 4000;
+            if (imageStalled || imageAged) {
+              CAM.pendingFrameSeq = 0;
+              CAM.lastFrameSeq = 0;
+              CAM.frameRetryAt = nowFrame + 300;
+            }
+          }
+        }
+        // 坐标方案下没有摄像头画面预览（/frame.png 已不适用），小窗显示占位说明。
+      })
+      .catch(function (error) {
+        if (!CAM.pollErrorLogged) {
+          CAM.pollErrorLogged = true;
+          logGameEvent("bridge_poll_failed", {
+            error: String(error || "poll failed")
+          });
+        }
+        CAM.ok = false;
+        CAM.present = false;
+        CAM.bodyAction = "stand";
+        CAM.bodyActionUntil = 0;
+        if (hudCam) {
+          hudCam.classList.remove("on");
+          var t = hudCam.querySelector(".cam-txt");
+          if (t) t.textContent = "摄像头未连接";
+        }
+      })
+      .finally(function () {
+        clearTimeout(timeout);
+        CAM.polling = false;
+      });
+  }
+
+  heroReset();
+  requestAnimationFrame(heroTick);
+  requestAnimationFrame(playerStep);
+  setInterval(pollCamera, 33);
+
+  /* ===== 退出 ===== */
+  function exitGame() {
+    try { window.close(); } catch (e) {}
+    setTimeout(function () {
+      if (!document.hidden) {
+        showToast("浏览器限制了关闭，请按 Alt+F4 或关闭标签页");
+      }
+    }, 300);
+  }
+
+  /* ===== Toast ===== */
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toast.classList.remove("show"); }, 8000);
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+{
+  "created_at": "2026-10-31T06:19:59.010750+00:00",
+  "protocol": "strict_holdout_human_and_arm",
+  "window_size": 18,
+  "training_captures": [
+    "C:\\Users\\Administrator\\Desktop\\11点骨架训练数据\\左抬手\\soulrider_diagnostic_2026-10-30T16-46-44-934Z.json",
+    "C:\\Users\\Administrator\\Desktop\\11点骨架训练数据\\右抬手\\soulrider_diagnostic_2026-10-30T16-45-47-490Z.json",
+    "C:\\Users\\Administrator\\Desktop\\11点骨架训练数据\\下蹲\\soulrider_diagnostic_2026-10-30T16-47-40-925Z.json",
+    "C:\\Users\\Administrator\\Desktop\\11点骨架训练数据\\无意义动作\\soulrider_diagnostic_2026-10-30T16-48-14-662Z.json",
+    "C:\\Users\\Administrator\\Desktop\\11点骨架训练数据\\无人物\\soulrider_diagnostic_2026-10-30T17-14-37-449Z.json"
+  ],
+  "test_captures": [
+    "C:\\Users\\Administrator\\Desktop\\11点骨架训练数据\\左抬手\\soulrider_diagnostic_2026-10-30T16-55-19-350Z.json",
+    "C:\\Users\\Administrator\\Desktop\\11点骨架训练数据\\右抬手\\soulrider_diagnostic_2026-10-30T16-54-45-395Z.json",
+    "C:\\Users\\Administrator\\Desktop\\11点骨架训练数据\\下蹲\\soulrider_diagnostic_2026-10-30T16-52-24-715Z.json",
+    "C:\\Users\\Administrator\\Desktop\\11点骨架训练数据\\无意义动作\\soulrider_diagnostic_2026-10-30T16-53-10-011Z.json",
+    "C:\\Users\\Administrator\\Desktop\\11点骨架训练数据\\无人物\\soulrider_diagnostic_2026-10-30T17-15-09-325Z.json"
+  ],
+  "human": {
+    "threshold": 0.65,
+    "accuracy": 1.0,
+    "human_recall": 1.0,
+    "empty_recall": 1.0
+  },
+  "arm": {
+    "accuracy": 0.9484126984126984
+  },
+  "capture_results": [
+    {
+      "capture": "C:\\Users\\Administrator\\Desktop\\11点骨架训练数据\\左抬手\\soulrider_diagnostic_2026-10-30T16-55-19-350Z.json",
+      "source": "left",
+      "human_mean": 0.9986916779163479,
+      "arm_counts": {
+        "left_raise": 51,
+        "right_raise": 0,
+        "no_raise": 0
+      }
+    },
+    {
+      "capture": "C:\\Users\\Administrator\\Desktop\\11点骨架训练数据\\右抬手\\soulrider_diagnostic_2026-10-30T16-54-45-395Z.json",
+      "source": "right",
+      "human_mean": 0.9979993201351305,
+      "arm_counts": {
+        "left_raise": 0,
+        "right_raise": 37,
+        "no_raise": 13
+      }
+    },
+    {
+      "capture": "C:\\Users\\Administrator\\Desktop\\11点骨架训练数据\\下蹲\\soulrider_diagnostic_2026-10-30T16-52-24-715Z.json",
+      "source": "squat",
+      "human_mean": 0.9999222960759055,
+      "arm_counts": {
+        "left_raise": 0,
+        "right_raise": 0,
+        "no_raise": 50
+      }
+    },
+    {
+      "capture": "C:\\Users\\Administrator\\Desktop\\11点骨架训练数据\\无意义动作\\soulrider_diagnostic_2026-10-30T16-53-10-011Z.json",
+      "source": "garbage",
+      "human_mean": 0.9995795702222136,
+      "arm_counts": {
+        "left_raise": 0,
+        "right_raise": 0,
+        "no_raise": 50
+      }
+    },
+    {
+      "capture": "C:\\Users\\Administrator\\Desktop\\11点骨架训练数据\\无人物\\soulrider_diagnostic_2026-10-30T17-15-09-325Z.json",
+      "source": "empty",
+      "human_mean": 0.0001343090882001919,
+      "arm_counts": {
+        "left_raise": 0,
+        "right_raise": 0,
+        "no_raise": 51
+      }
+    }
+  ]
+}

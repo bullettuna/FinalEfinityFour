@@ -1,13 +1,7 @@
-# ============================================================
-# FinalEfinityFour - repository ignore rules
-# ============================================================
-
-# PC 端便携运行时（PyInstaller 冻结包，3.3 GB，含 12 个 >100 MB 的
-# CUDA/torch DLL，GitHub 单文件硬上限 100 MB，无法入库）
-finalGamePC/
-
-# Efinity 构建中间产物（可重新综合生成）
+# Efinity generated outputs
 outflow/
+work_*/
+RUNPNR_*/
 *.sdb
 *.log
 *.troutingtraces
@@ -16,16 +10,25 @@ outflow/
 *.lbf
 *.vdb
 
-# Python
+# Python runtime, caches and local builds
 __pycache__/
 *.py[cod]
-.venv/
+.venv*/
 *.egg-info/
+/Local/FPGA_GAME/logs/
+/Local/FPGA_GAME/outputs/
+/Local/FPGA_GAME/build/
+/Local/FPGA_GAME/dist/
 
-# 系统杂项
+# Local credentials
+.env
+.env.*
+*.pem
+*.pfx
+*.p12
+
+# OS and editor temporary files
 Thumbs.db
 desktop.ini
 .DS_Store
-
-# 报告类日志体积很小，是构建/烧录证据，需要保留
-!reports/**/*.log
+~$*

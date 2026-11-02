@@ -1,0 +1,2218 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Soul Rider · 姿态调试模式</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --panel: #151c24;
+      --line: #354250;
+      --text: #eef3f8;
+      --muted: #93a4b8;
+      --gold: #e0bd68;
+      --ok: #42d392;
+      --bad: #ef6262;
+    }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+      overflow: hidden;
+    }
+    header {
+      height: 58px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+      background: #10161d;
+    }
+    h1 { margin: 0; font-size: 18px; letter-spacing: 0.08em; }
+    .actions { display: flex; align-items: center; gap: 14px; }
+    .status { color: var(--muted); font-size: 13px; }
+    .status.ok { color: var(--ok); }
+    .status.bad { color: var(--bad); }
+    button {
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: #202a35;
+      color: var(--text);
+      padding: 8px 14px;
+      font: inherit;
+      cursor: pointer;
+    }
+    button:hover { border-color: var(--gold); color: var(--gold); }
+    main {
+      height: calc(100% - 58px);
+      padding: 16px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 390px;
+      gap: 16px;
+    }
+    .preview {
+      position: relative;
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #000;
+      overflow: hidden;
+    }
+    .preview img {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      image-rendering: pixelated;
+      display: none;
+    }
+    .yolo-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .bbox-box {
+      fill: none;
+      stroke: #59c3ff;
+      stroke-width: 2;
+      vector-effect: non-scaling-stroke;
+    }
+    .bbox-label {
+      fill: #59c3ff;
+      stroke: rgba(0, 0, 0, 0.9);
+      stroke-width: 3;
+      paint-order: stroke;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .point-line-halo {
+      stroke: rgba(0, 0, 0, 0.72);
+      stroke-width: 6;
+      stroke-linecap: round;
+      vector-effect: non-scaling-stroke;
+    }
+    .point-line {
+      stroke: var(--gold);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      vector-effect: non-scaling-stroke;
+    }
+    .point-dot {
+      fill: var(--gold);
+      stroke: #0d1117;
+      stroke-width: 2;
+      vector-effect: non-scaling-stroke;
+    }
+    .point-dot.warn { fill: #f4c95d; }
+    .point-dot.bad { fill: var(--bad); }
+    .placeholder {
+      color: var(--muted);
+      font-size: 14px;
+      letter-spacing: 0.08em;
+    }
+    .readout {
+      padding: 18px;
+      min-height: 0;
+      overflow-y: auto;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--panel);
+    }
+    .inference-mode {
+      margin-bottom: 20px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid rgba(53, 66, 80, 0.7);
+    }
+    .mode-tabs {
+      display: grid;
+      gap: 6px;
+    }
+    .mode-tab {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      width: 100%;
+      padding: 9px 11px;
+      border-color: var(--line);
+      background: #0d131a;
+      color: var(--muted);
+      text-align: left;
+    }
+    .mode-tab.active {
+      border-color: #586b80;
+      background: #202a35;
+      color: var(--text);
+      box-shadow: inset 3px 0 0 var(--gold);
+    }
+    .mode-kind {
+      flex: 0 0 auto;
+      color: var(--muted);
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 11px;
+    }
+    .mode-tab.active .mode-kind { color: var(--gold); }
+    .layer-options {
+      display: grid;
+      gap: 9px;
+      margin-top: 12px;
+      padding: 10px 0 0 14px;
+      border-top: 1px solid rgba(53, 66, 80, 0.7);
+      border-left: 2px solid rgba(224, 189, 104, 0.5);
+    }
+    .layer-options[hidden] { display: none; }
+    .layer-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text);
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .layer-option input {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      accent-color: var(--gold);
+      cursor: pointer;
+    }
+    .layer-option span { flex: 1; }
+    h2 {
+      margin: 0 0 16px;
+      color: var(--gold);
+      font-size: 15px;
+      letter-spacing: 0.12em;
+      font-weight: 600;
+    }
+    dl { margin: 0; display: grid; gap: 14px; }
+    .row { border-bottom: 1px solid rgba(53, 66, 80, 0.7); padding-bottom: 12px; }
+    .row:last-child { border-bottom: 0; }
+    dt { color: var(--muted); font-size: 12px; margin-bottom: 6px; }
+    dd {
+      margin: 0;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 20px;
+      color: var(--text);
+      overflow-wrap: anywhere;
+    }
+    .preview-toolbar {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      pointer-events: none;
+    }
+    .preview-toolbar > * { pointer-events: auto; }
+    .preview-badge {
+      padding: 6px 9px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      background: rgba(8, 12, 17, 0.82);
+      color: var(--muted);
+      font: 12px Consolas, "Courier New", monospace;
+    }
+    .preview-badge.frozen {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    .toolbar-actions { display: flex; gap: 6px; }
+    .toolbar-actions button { padding: 6px 10px; font-size: 12px; }
+    .health-strip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .health-pill {
+      padding: 5px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      font: 11px Consolas, "Courier New", monospace;
+      white-space: nowrap;
+    }
+    .health-pill.ok { border-color: rgba(66, 211, 146, 0.5); color: var(--ok); }
+    .health-pill.bad { border-color: rgba(239, 98, 98, 0.5); color: var(--bad); }
+    .health-pill.warn { border-color: rgba(224, 189, 104, 0.5); color: var(--gold); }
+    .tabbar {
+      display: flex;
+      gap: 4px;
+      margin: 14px 0 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--line);
+      overflow-x: auto;
+    }
+    .tabbar button {
+      flex: 0 0 auto;
+      padding: 7px 9px;
+      font-size: 12px;
+      background: transparent;
+    }
+    .tabbar button.active {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(224, 189, 104, 0.08);
+    }
+    .tab-panel[hidden] { display: none; }
+    .section-title {
+      margin: 18px 0 10px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .section-title:first-child { margin-top: 0; }
+    .gauge-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .arm-gauge {
+      min-width: 0;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: #0d131a;
+    }
+    .arm-gauge h3 {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0 0 9px;
+      font-size: 13px;
+    }
+    .gauge-state {
+      color: var(--muted);
+      font: 10px Consolas, "Courier New", monospace;
+    }
+    .gauge-state.ok { color: var(--ok); }
+    .gauge-state.bad { color: var(--bad); }
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      margin: 6px 0;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .metric strong {
+      color: var(--text);
+      font: 11px Consolas, "Courier New", monospace;
+      text-align: right;
+    }
+    .meter {
+      height: 7px;
+      margin-top: 8px;
+      overflow: hidden;
+      border-radius: 2px;
+      background: #27313c;
+    }
+    .meter > span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: var(--gold);
+      transition: width 120ms linear;
+    }
+    .meter > span.ok { background: var(--ok); }
+    .meter > span.bad { background: var(--bad); }
+    .decision {
+      margin-top: 10px;
+      padding: 10px;
+      border-left: 3px solid var(--line);
+      background: #0d131a;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    .decision.ok { border-left-color: var(--ok); }
+    .decision.bad { border-left-color: var(--bad); }
+    .decision.warn { border-left-color: var(--gold); }
+    .decision strong { color: var(--text); }
+    .progress {
+      height: 9px;
+      margin: 12px 0;
+      overflow: hidden;
+      border-radius: 2px;
+      background: #27313c;
+    }
+    .progress > span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: var(--gold);
+      transition: width 160ms linear;
+    }
+    .table-wrap {
+      max-height: 300px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    th, td {
+      padding: 6px 7px;
+      border-bottom: 1px solid rgba(53, 66, 80, 0.65);
+      text-align: left;
+      white-space: nowrap;
+    }
+    th { position: sticky; top: 0; background: #17202a; color: var(--muted); }
+    tr.bad td { color: var(--bad); }
+    tr.warn td { color: var(--gold); }
+    .event-list {
+      max-height: 300px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+    }
+    .event-row {
+      display: grid;
+      grid-template-columns: 64px 1fr auto;
+      gap: 7px;
+      width: 100%;
+      padding: 7px;
+      border: 0;
+      border-bottom: 1px solid rgba(53, 66, 80, 0.6);
+      border-radius: 0;
+      background: transparent;
+      color: var(--muted);
+      text-align: left;
+      font-size: 11px;
+    }
+    .event-row:hover { background: #17202a; color: var(--text); }
+    .event-row.selected { background: #202a35; color: var(--gold); }
+    .event-row .event-name { overflow: hidden; text-overflow: ellipsis; }
+    .event-row .event-stage { color: var(--gold); }
+    .json-view {
+      min-height: 120px;
+      max-height: 260px;
+      margin: 10px 0 0;
+      padding: 9px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: #090d12;
+      color: #b8c7d8;
+      font: 11px/1.45 Consolas, "Courier New", monospace;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .tune-list { display: grid; gap: 10px; }
+    .tune-item {
+      padding-bottom: 9px;
+      border-bottom: 1px solid rgba(53, 66, 80, 0.55);
+    }
+    .tune-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .tune-controls {
+      display: grid;
+      grid-template-columns: 1fr 74px;
+      align-items: center;
+      gap: 8px;
+    }
+    .tune-controls input[type="range"] { width: 100%; accent-color: var(--gold); }
+    .tune-controls input[type="number"] {
+      width: 100%;
+      padding: 5px;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      background: #0d131a;
+      color: var(--text);
+      font: 11px Consolas, "Courier New", monospace;
+    }
+    .tune-controls input[type="checkbox"] {
+      width: 22px;
+      height: 22px;
+      accent-color: var(--gold);
+      cursor: pointer;
+    }
+    .button-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+    .button-row button { flex: 1 1 auto; padding: 7px 8px; font-size: 11px; }
+    .inline-message {
+      min-height: 17px;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .inline-message.ok { color: var(--ok); }
+    .inline-message.bad { color: var(--bad); }
+    .link-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .link-metric {
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: #0d131a;
+    }
+    .link-metric span {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+    .link-metric strong {
+      color: var(--text);
+      font: 12px Consolas, "Courier New", monospace;
+    }
+    .compact-dl { gap: 8px; }
+    .compact-dl .row { padding-bottom: 8px; }
+    .compact-dl dd { font-size: 14px; }
+    @media (max-width: 900px) {
+      html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
+      body { overflow-y: auto; }
+      header {
+        height: auto;
+        min-height: 58px;
+        padding: 10px 16px;
+        gap: 8px;
+        align-items: flex-start;
+        flex-direction: column;
+        flex-wrap: wrap;
+      }
+      h1 { font-size: 17px; white-space: nowrap; }
+      .actions {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .health-strip { width: 100%; justify-content: flex-start; }
+      .actions button { flex: 0 0 auto; white-space: nowrap; }
+      .status {
+        flex: 1 1 100%;
+        min-width: 0;
+        font-size: 12px;
+        overflow-wrap: anywhere;
+      }
+      .actions #back { width: 100%; margin-left: 0; }
+      main {
+        height: auto;
+        min-height: calc(100% - 58px);
+        grid-template-columns: 1fr;
+        padding: 12px;
+        width: 100%;
+        max-width: 100vw;
+      }
+      .preview { width: 100%; max-width: 100%; min-height: 52vw; }
+      .preview-toolbar { flex-wrap: wrap; align-items: flex-start; }
+      .toolbar-actions {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+      }
+      .toolbar-actions button { flex: 1 1 0; min-width: 0; }
+      .readout { width: 100%; max-width: 100%; overflow-x: hidden; }
+      .gauge-grid, .link-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Soul Rider · 姿态诊断台</h1>
+    <div class="actions">
+      <div class="health-strip">
+        <span class="health-pill" id="health-connection">bridge --</span>
+        <span class="health-pill" id="health-frame">frame --</span>
+        <span class="health-pill" id="health-link">link --</span>
+      </div>
+      <span class="status" id="status">正在启动识别...</span>
+      <button id="back">返回主菜单 · Esc</button>
+    </div>
+  </header>
+  <main>
+    <section class="preview">
+      <div class="preview-toolbar">
+        <span class="preview-badge" id="freeze-badge">LIVE · frame --</span>
+        <div class="toolbar-actions">
+          <button id="freeze-frame" type="button">冻结画面</button>
+          <button id="export-diagnostics" type="button">导出最近10秒</button>
+        </div>
+      </div>
+      <span class="placeholder" id="placeholder">等待 YOLO 画面</span>
+      <img id="frame" alt="FPGA 边缘图" draggable="false" />
+      <svg
+        class="yolo-overlay"
+        id="yolo-overlay"
+        viewBox="0 0 640 360"
+        preserveAspectRatio="xMidYMid meet"
+        aria-hidden="true"
+      >
+        <g id="bbox-layer" display="none">
+          <rect class="bbox-box" id="bbox-rect" rx="2" ry="2" />
+          <text class="bbox-label" id="bbox-label"></text>
+        </g>
+        <g id="pose-layer" display="none">
+          <g class="point-line-halo" id="pose-lines-halo"></g>
+          <g class="point-line" id="pose-lines"></g>
+          <g id="pose-dots"></g>
+        </g>
+      </svg>
+    </section>
+    <aside class="readout">
+      <nav class="tabbar" id="diagnostic-tabs" aria-label="诊断面板">
+        <button class="active" type="button" data-panel="action">动作</button>
+        <button type="button" data-panel="calibration">校准</button>
+        <button type="button" data-panel="quality">关键点</button>
+        <button type="button" data-panel="events">事件</button>
+        <button type="button" data-panel="tuning">调参</button>
+        <button type="button" data-panel="link">链路</button>
+      </nav>
+
+      <section class="tab-panel" data-panel-content="action">
+        <section class="inference-mode" aria-labelledby="inference-mode-title">
+          <h2 id="inference-mode-title">推理模式</h2>
+          <nav class="mode-tabs" id="detection-mode-tabs" role="tablist" aria-label="推理模式">
+            <button class="mode-tab active" type="button" data-detection-mode="yolo" role="tab" aria-selected="true">
+              <span>电脑 YOLO 推理</span>
+              <span class="mode-kind">kind=3</span>
+            </button>
+            <button class="mode-tab" type="button" data-detection-mode="four_point" role="tab" aria-selected="false">
+              <span>四点骨架图</span>
+              <span class="mode-kind">kind=4</span>
+            </button>
+            <button class="mode-tab" type="button" data-detection-mode="eleven_point" role="tab" aria-selected="false">
+              <span>十一点骨架图</span>
+              <span class="mode-kind">kind=5</span>
+            </button>
+          </nav>
+          <div class="layer-options" id="layer-options">
+            <label class="layer-option" for="show-edge">
+              <input id="show-edge" type="checkbox" checked />
+              <span>Edge</span>
+            </label>
+            <label class="layer-option" for="show-bbox">
+              <input id="show-bbox" type="checkbox" checked />
+              <span>BBox</span>
+            </label>
+            <label class="layer-option" for="show-pose">
+              <input id="show-pose" type="checkbox" checked />
+              <span>Pose</span>
+            </label>
+          </div>
+        </section>
+
+        <h2>左右手判定</h2>
+        <div class="gauge-grid">
+          <article class="arm-gauge">
+            <h3><span>左手</span><span class="gauge-state" id="left-gauge-state">等待</span></h3>
+            <div class="metric"><span>基线</span><strong id="left-baseline">--</strong></div>
+            <div class="metric"><span>当前</span><strong id="left-current">--</strong></div>
+            <div class="metric"><span>抬升</span><strong id="left-rise">--</strong></div>
+            <div class="metric"><span>阈值</span><strong id="left-threshold">--</strong></div>
+            <div class="metric"><span>腕抬升</span><strong id="left-wrist-rise">--</strong></div>
+            <div class="metric"><span>腕肘差</span><strong id="left-wrist-offset">--</strong></div>
+            <div class="metric"><span>确认票</span><strong id="left-votes">--</strong></div>
+            <div class="metric"><span>冷却</span><strong id="left-cooldown">--</strong></div>
+            <div class="meter"><span id="left-rise-meter"></span></div>
+          </article>
+          <article class="arm-gauge">
+            <h3><span>右手</span><span class="gauge-state" id="right-gauge-state">等待</span></h3>
+            <div class="metric"><span>基线</span><strong id="right-baseline">--</strong></div>
+            <div class="metric"><span>当前</span><strong id="right-current">--</strong></div>
+            <div class="metric"><span>抬升</span><strong id="right-rise">--</strong></div>
+            <div class="metric"><span>阈值</span><strong id="right-threshold">--</strong></div>
+            <div class="metric"><span>腕抬升</span><strong id="right-wrist-rise">--</strong></div>
+            <div class="metric"><span>腕肘差</span><strong id="right-wrist-offset">--</strong></div>
+            <div class="metric"><span>确认票</span><strong id="right-votes">--</strong></div>
+            <div class="metric"><span>冷却</span><strong id="right-cooldown">--</strong></div>
+            <div class="meter"><span id="right-rise-meter"></span></div>
+          </article>
+        </div>
+
+        <div class="decision" id="decision-summary">
+          <strong>等待状态</strong><br />尚未收到有效诊断数据。
+        </div>
+
+        <h2 style="margin-top:18px">识别结果</h2>
+        <dl class="compact-dl">
+          <div class="row"><dt>action</dt><dd id="action">--</dd></div>
+          <div class="row"><dt>body_action</dt><dd id="body-action">--</dd></div>
+          <div class="row"><dt>下蹲速度</dt><dd id="squat-speed">--</dd></div>
+          <div class="row"><dt>髋部速度</dt><dd id="hip-speed">--</dd></div>
+          <div class="row"><dt>髋部下降</dt><dd id="hip-drop">--</dd></div>
+          <div class="row"><dt>下半身确认</dt><dd id="lower-body-confirmed">--</dd></div>
+          <div class="row"><dt>人体置信度</dt><dd id="human-confidence">--</dd></div>
+          <div class="row"><dt>抬手置信度</dt><dd id="raise-confidence">--</dd></div>
+          <div class="row"><dt>左右手概率</dt><dd id="arm-probabilities">--</dd></div>
+          <div class="row"><dt>成熟规则 / 模型</dt><dd id="rule-model-side">--</dd></div>
+          <div class="row"><dt>融合置信度</dt><dd id="combined-confidence">--</dd></div>
+          <div class="row"><dt>人体门卫</dt><dd id="model-gate">--</dd></div>
+          <div class="row"><dt>模型窗口</dt><dd id="model-window">--</dd></div>
+          <div class="row"><dt>act_action</dt><dd id="act-action">None</dd></div>
+          <div class="row"><dt>防御动作</dt><dd id="def-action">None</dd></div>
+          <div class="row"><dt>FPGA FPS</dt><dd id="fpga-fps">--</dd></div>
+          <div class="row"><dt>推理 FPS</dt><dd id="inference-fps">--</dd></div>
+          <div class="row"><dt>推理耗时</dt><dd id="inference-ms">--</dd></div>
+          <div class="row"><dt>动作事件数</dt><dd id="action-event-count">0</dd></div>
+        </dl>
+      </section>
+
+      <section class="tab-panel" data-panel-content="calibration" hidden>
+        <h2>中立姿势校准</h2>
+        <div class="metric"><span>状态</span><strong id="calibration-state">--</strong></div>
+        <div class="metric"><span>原因</span><strong id="calibration-reason">--</strong></div>
+        <div class="metric"><span>有效中立帧</span><strong id="calibration-frames">--</strong></div>
+        <div class="metric"><span>已用时间</span><strong id="calibration-time">--</strong></div>
+        <div class="progress"><span id="calibration-progress"></span></div>
+        <div class="decision" id="calibration-copy">
+          点击重新校准后，请保持双手自然下垂。校准最多等待 3 秒。
+        </div>
+        <div class="button-row">
+          <button id="recalibrate" type="button">重新校准基线</button>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel-content="quality" hidden>
+        <h2>关键点质量</h2>
+        <div class="metric"><span>整帧原因</span><strong id="quality-reason">--</strong></div>
+        <div class="metric"><span>阈值 / 来源</span><strong id="quality-source">--</strong></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>#</th><th>点</th><th>X</th><th>Y</th><th>分数</th><th>状态</th></tr>
+            </thead>
+            <tbody id="quality-table"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel-content="events" hidden>
+        <h2>动作事件</h2>
+        <div class="button-row" style="margin-top:0">
+          <select id="event-filter" aria-label="事件过滤" style="flex:1;padding:7px;background:#0d131a;color:var(--text);border:1px solid var(--line);border-radius:3px">
+            <option value="key">关键事件</option>
+            <option value="blocked">拦截事件</option>
+            <option value="all">全部事件</option>
+          </select>
+          <button id="clear-events" type="button">清空页面</button>
+        </div>
+        <div class="event-list" id="event-list">
+          <div class="inline-message">等待事件...</div>
+        </div>
+        <pre class="json-view" id="event-json">选择一条事件查看详情。</pre>
+      </section>
+
+      <section class="tab-panel" data-panel-content="tuning" hidden>
+        <h2>在线调参</h2>
+        <div class="tune-list" id="tune-list"></div>
+        <div class="button-row">
+          <button id="apply-tuning" type="button">临时应用</button>
+          <button id="save-tuning" type="button">保存为默认</button>
+          <button id="reset-tuning" type="button">恢复默认</button>
+        </div>
+        <div class="inline-message" id="tuning-message"></div>
+      </section>
+
+      <section class="tab-panel" data-panel-content="link" hidden>
+        <h2>传输链路</h2>
+        <div class="link-grid">
+          <div class="link-metric"><span>最后收帧年龄</span><strong id="link-age">--</strong></div>
+          <div class="link-metric"><span>数据类型</span><strong id="link-kind">--</strong></div>
+          <div class="link-metric"><span>frame_seq</span><strong id="link-frame">--</strong></div>
+          <div class="link-metric"><span>fpga_seq</span><strong id="link-fpga">--</strong></div>
+          <div class="link-metric"><span>CRC 错误</span><strong id="link-crc">--</strong></div>
+          <div class="link-metric"><span>帧头错误</span><strong id="link-header">--</strong></div>
+          <div class="link-metric"><span>序列缺口</span><strong id="link-gaps">--</strong></div>
+          <div class="link-metric"><span>重连次数</span><strong id="link-reopens">--</strong></div>
+          <div class="link-metric"><span>USB 速率</span><strong id="link-usb">--</strong></div>
+          <div class="link-metric"><span>FPS</span><strong id="link-fps">--</strong></div>
+        </div>
+        <div class="decision" id="link-recovery">尚未发生自动恢复。</div>
+        <pre class="json-view" id="full-state-json">等待 /state...</pre>
+      </section>
+    </aside>
+  </main>
+  <script>
+    (function () {
+      "use strict";
+
+      var API = (location.protocol === "http:" || location.protocol === "https:")
+        ? location.origin
+        : "http://127.0.0.1:8765";
+      var statusEl = document.getElementById("status");
+      var placeholder = document.getElementById("placeholder");
+      var frameEl = document.getElementById("frame");
+      var modeTabs = document.querySelectorAll("[data-detection-mode]");
+      var layerOptions = document.getElementById("layer-options");
+      var edgeToggle = document.getElementById("show-edge");
+      var bboxToggle = document.getElementById("show-bbox");
+      var poseToggle = document.getElementById("show-pose");
+      var bboxLayer = document.getElementById("bbox-layer");
+      var bboxRect = document.getElementById("bbox-rect");
+      var bboxLabel = document.getElementById("bbox-label");
+      var poseLayer = document.getElementById("pose-layer");
+      var poseLinesHalo = document.getElementById("pose-lines-halo");
+      var poseLines = document.getElementById("pose-lines");
+      var poseDotsGroup = document.getElementById("pose-dots");
+      var lastFrameSeq = 0;
+      var lastActionSeq = null;
+      var lastBodyActionSeq = null;
+      var actActionTimer = 0;
+      var bodyActionTimer = 0;
+      var pollTimer = 0;
+      var pollInFlight = false;
+      var leaving = false;
+      var ACT_ACTION_DURATION_MS = 420;
+      var BODY_ACTION_DURATION_MS = 420;
+      var DETECTION_MODE_KEY = "soul-rider-debug-detection-mode";
+      var DETECTION_MODES = {
+        yolo: { kind: 3, label: "电脑 YOLO 推理", waiting: "等待 YOLO 画面" },
+        four_point: { kind: 4, label: "四点骨架图", waiting: "等待 kind=4 四点数据" },
+        eleven_point: { kind: 5, label: "十一点骨架图", waiting: "等待 kind=5 十一点数据" }
+      };
+      var currentDetectionMode = "eleven_point";
+      var detectionModeRequest = 0;
+      var lastDetectionModeSyncAt = 0;
+      var hasEdgeFrame = false;
+      var bboxHasData = false;
+      var poseHasData = false;
+      var poseKind = "none";
+      var poseLineElements = [];
+      var poseDotElements = [];
+      var SVG_NS = "http://www.w3.org/2000/svg";
+      var PREVIEW_WIDTH = 640;
+      var PREVIEW_HEIGHT = 360;
+      var KEYPOINT_LINE_MIN_CONFIDENCE = 0.05;
+      var COCO_SKELETON = [
+        [15, 13], [13, 11], [16, 14], [14, 12], [11, 12],
+        [5, 11], [6, 12], [5, 6], [5, 7], [6, 8],
+        [7, 9], [8, 10], [1, 2], [0, 1], [0, 2],
+        [1, 3], [2, 4], [3, 5], [4, 6]
+      ];
+      var COCO_POINT_NAMES = [
+        "nose", "left_eye", "right_eye", "left_ear", "right_ear",
+        "left_shoulder", "right_shoulder", "left_elbow", "right_elbow",
+        "left_wrist", "right_wrist", "left_hip", "right_hip",
+        "left_knee", "right_knee", "left_ankle", "right_ankle"
+      ];
+      var liveState = null;
+      var frozenState = null;
+      var frozen = false;
+      var stateReceivedAt = 0;
+      var debugEvents = [];
+      var lastDebugEventId = 0;
+      var selectedEventId = null;
+      var tuningControls = {};
+      var tuningLoaded = false;
+      var sessionAttached = false;
+      var diagnosticTabs = document.querySelectorAll("[data-panel]");
+      var diagnosticPanels = document.querySelectorAll("[data-panel-content]");
+
+      function createSvgElement(name, className) {
+        var element = document.createElementNS(SVG_NS, name);
+        if (className) element.setAttribute("class", className);
+        return element;
+      }
+
+      function buildPoseElements() {
+        COCO_SKELETON.forEach(function (pair) {
+          var halo = createSvgElement("line");
+          var line = createSvgElement("line");
+          halo.setAttribute("display", "none");
+          line.setAttribute("display", "none");
+          poseLinesHalo.appendChild(halo);
+          poseLines.appendChild(line);
+          poseLineElements.push({ pair: pair, halo: halo, line: line });
+        });
+        for (var i = 0; i < 17; i++) {
+          var dot = createSvgElement("circle", "point-dot");
+          dot.setAttribute("r", "3.6");
+          dot.setAttribute("display", "none");
+          poseDotsGroup.appendChild(dot);
+          poseDotElements.push(dot);
+        }
+      }
+
+      function setSvgVisible(element, visible) {
+        if (visible) {
+          element.removeAttribute("display");
+        } else {
+          element.setAttribute("display", "none");
+        }
+      }
+
+      function isYoloMode() {
+        return currentDetectionMode === "yolo";
+      }
+
+      function modeInfo() {
+        return DETECTION_MODES[currentDetectionMode] || DETECTION_MODES.yolo;
+      }
+
+      function setActiveModeTab() {
+        modeTabs.forEach(function (tab) {
+          var selected = tab.dataset.detectionMode === currentDetectionMode;
+          tab.classList.toggle("active", selected);
+          tab.setAttribute("aria-selected", String(selected));
+          tab.tabIndex = selected ? 0 : -1;
+        });
+      }
+
+      function syncLayerVisibility() {
+        var yoloMode = isYoloMode();
+        layerOptions.hidden = !yoloMode;
+
+        var edgeVisible =
+          yoloMode && edgeToggle.checked && hasEdgeFrame;
+        var bboxVisible =
+          yoloMode && bboxToggle.checked && bboxHasData;
+        var pointModeVisible =
+          !yoloMode && poseKind === currentDetectionMode && poseHasData;
+        var poseVisible = pointModeVisible ||
+          (yoloMode && poseToggle.checked && poseHasData);
+
+        frameEl.style.display = edgeVisible ? "block" : "none";
+        setSvgVisible(bboxLayer, bboxVisible);
+        setSvgVisible(poseLayer, poseVisible);
+
+        if (pointModeVisible) {
+          placeholder.style.display = "none";
+        } else if (!yoloMode) {
+          placeholder.textContent = modeInfo().waiting;
+          placeholder.style.display = "block";
+        } else if (!edgeToggle.checked && !bboxToggle.checked && !poseToggle.checked) {
+          placeholder.textContent = "所有图层已关闭";
+          placeholder.style.display = "block";
+        } else if (!edgeVisible && !bboxVisible && !poseVisible) {
+          placeholder.textContent = "等待 YOLO 检测结果";
+          placeholder.style.display = "block";
+        } else {
+          placeholder.style.display = "none";
+        }
+      }
+
+      function clampPreview(value, maximum) {
+        return Math.max(0, Math.min(maximum, value));
+      }
+
+      function drawBBox(state) {
+        var box = state.bbox_xyxy;
+        if (!Array.isArray(box) || box.length < 4) {
+          bboxHasData = false;
+          return;
+        }
+        var x1 = Number(box[0]);
+        var y1 = Number(box[1]);
+        var x2 = Number(box[2]);
+        var y2 = Number(box[3]);
+        if (
+          !Number.isFinite(x1) || !Number.isFinite(y1) ||
+          !Number.isFinite(x2) || !Number.isFinite(y2)
+        ) {
+          bboxHasData = false;
+          return;
+        }
+
+        x1 = clampPreview(x1, PREVIEW_WIDTH);
+        y1 = clampPreview(y1, PREVIEW_HEIGHT);
+        x2 = clampPreview(x2, PREVIEW_WIDTH);
+        y2 = clampPreview(y2, PREVIEW_HEIGHT);
+        var width = Math.max(0, x2 - x1);
+        var height = Math.max(0, y2 - y1);
+        if (width <= 0 || height <= 0) {
+          bboxHasData = false;
+          return;
+        }
+
+        bboxRect.setAttribute("x", x1.toFixed(1));
+        bboxRect.setAttribute("y", y1.toFixed(1));
+        bboxRect.setAttribute("width", width.toFixed(1));
+        bboxRect.setAttribute("height", height.toFixed(1));
+
+        var confidence = Number(state.bbox_confidence);
+        bboxLabel.textContent = Number.isFinite(confidence)
+          ? "person " + confidence.toFixed(2)
+          : "person";
+        bboxLabel.setAttribute("x", x1.toFixed(1));
+        bboxLabel.setAttribute("y", Math.max(14, y1 - 6).toFixed(1));
+        bboxHasData = true;
+      }
+
+      function drawPose(state) {
+        var expectedKind = modeInfo().kind;
+        var expectedPointCount = currentDetectionMode === "eleven_point" ? 11 : 4;
+        var pointState =
+          !isYoloMode() &&
+          state.valid !== false &&
+          Array.isArray(state.points) &&
+          state.points.length >= expectedPointCount &&
+          (state.detection_mode === currentDetectionMode || state.kind === expectedKind);
+        if (pointState) {
+          poseKind = currentDetectionMode;
+          var points = state.points.slice(0, expectedPointCount).map(function (point) {
+            var x = Array.isArray(point) ? Number(point[0]) : Number(point && point.x);
+            var y = Array.isArray(point) ? Number(point[1]) : Number(point && point.y);
+            if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+            return {
+              x: clampPreview(x, PREVIEW_WIDTH),
+              y: clampPreview(y, PREVIEW_HEIGHT),
+              score: Number(point && point.score)
+            };
+          });
+
+          poseDotElements.forEach(function (dot, index) {
+            var point = index < expectedPointCount ? points[index] : null;
+            if (!point) {
+              setSvgVisible(dot, false);
+              return;
+            }
+            dot.setAttribute("cx", point.x.toFixed(1));
+            dot.setAttribute("cy", point.y.toFixed(1));
+            dot.style.opacity = "1";
+            dot.setAttribute(
+              "class",
+              Number.isFinite(point.score) && point.score < 0.1
+                ? "point-dot warn"
+                : "point-dot"
+            );
+            setSvgVisible(dot, true);
+          });
+
+          var edges = Array.isArray(state.skeleton_edges)
+            ? state.skeleton_edges
+            : (currentDetectionMode === "eleven_point"
+              ? [[0, 1], [0, 2], [1, 2], [1, 3], [3, 5], [2, 4], [4, 6],
+                 [1, 7], [2, 8], [7, 8], [7, 9], [8, 10]]
+              : [[0, 1], [0, 2], [1, 3]]);
+          poseLineElements.forEach(function (entry, index) {
+            var pair = edges[index];
+            var first = pair && points[Number(pair[0])];
+            var second = pair && points[Number(pair[1])];
+            [entry.halo, entry.line].forEach(function (line) {
+              if (!first || !second) {
+                setSvgVisible(line, false);
+                return;
+              }
+              line.setAttribute("x1", first.x.toFixed(1));
+              line.setAttribute("y1", first.y.toFixed(1));
+              line.setAttribute("x2", second.x.toFixed(1));
+              line.setAttribute("y2", second.y.toFixed(1));
+              setSvgVisible(line, true);
+            });
+          });
+          poseHasData = points.length === expectedPointCount && points.every(Boolean);
+          return;
+        }
+
+        if (!isYoloMode()) {
+          poseKind = currentDetectionMode;
+          poseHasData = false;
+          setSvgVisible(poseLayer, false);
+          return;
+        }
+
+        poseKind = "yolo";
+        var sourcePoints = state.keypoints_xy;
+        var sourceConfidence = state.keypoint_confidence;
+        if (!Array.isArray(sourcePoints) || sourcePoints.length < 17) {
+          poseHasData = false;
+          setSvgVisible(poseLayer, false);
+          return;
+        }
+
+        var points = [];
+        poseDotElements.forEach(function (dot, index) {
+          var source = sourcePoints[index];
+          var x = Array.isArray(source) ? Number(source[0]) : NaN;
+          var y = Array.isArray(source) ? Number(source[1]) : NaN;
+          var confidence = Array.isArray(sourceConfidence)
+            ? Number(sourceConfidence[index])
+            : 1;
+          var valid =
+            Number.isFinite(x) && Number.isFinite(y) && Number.isFinite(confidence) &&
+            confidence > 0;
+
+          if (!valid) {
+            points[index] = null;
+            setSvgVisible(dot, false);
+            return;
+          }
+
+          x = clampPreview(x, PREVIEW_WIDTH);
+          y = clampPreview(y, PREVIEW_HEIGHT);
+          points[index] = {
+            x: x,
+            y: y,
+            confidence: Math.max(0, Math.min(1, confidence))
+          };
+          dot.setAttribute("cx", x.toFixed(1));
+          dot.setAttribute("cy", y.toFixed(1));
+          var keypointThreshold =
+            state.debug && state.debug.quality &&
+            Number.isFinite(Number(state.debug.quality.keypoint_threshold))
+              ? Number(state.debug.quality.keypoint_threshold)
+              : 0.1;
+          dot.setAttribute(
+            "class",
+            confidence < keypointThreshold
+              ? "point-dot bad"
+              : confidence < keypointThreshold * 2
+                ? "point-dot warn"
+                : "point-dot"
+          );
+          dot.style.opacity = String(Math.max(0.25, Math.min(1, confidence * 2)));
+          setSvgVisible(dot, true);
+        });
+
+        poseLineElements.forEach(function (entry) {
+          var first = points[entry.pair[0]];
+          var second = points[entry.pair[1]];
+          var visible =
+            first && second &&
+            first.confidence >= KEYPOINT_LINE_MIN_CONFIDENCE &&
+            second.confidence >= KEYPOINT_LINE_MIN_CONFIDENCE;
+          [entry.halo, entry.line].forEach(function (line) {
+            if (!visible) {
+              setSvgVisible(line, false);
+              return;
+            }
+            line.setAttribute("x1", first.x.toFixed(1));
+            line.setAttribute("y1", first.y.toFixed(1));
+            line.setAttribute("x2", second.x.toFixed(1));
+            line.setAttribute("y2", second.y.toFixed(1));
+            setSvgVisible(line, true);
+          });
+        });
+        poseHasData = points.some(function (point) { return !!point; });
+      }
+
+      function clearBBoxAndPose() {
+        bboxHasData = false;
+        poseHasData = false;
+        poseKind = "none";
+        setSvgVisible(bboxLayer, false);
+        setSvgVisible(poseLayer, false);
+        poseLineElements.forEach(function (entry) {
+          setSvgVisible(entry.halo, false);
+          setSvgVisible(entry.line, false);
+        });
+        poseDotElements.forEach(function (dot) {
+          setSvgVisible(dot, false);
+        });
+      }
+
+      function setConnection(ok, text) {
+        statusEl.textContent = text;
+        statusEl.className = "status " + (ok ? "ok" : "bad");
+      }
+
+      function readDetectionMode() {
+        try {
+          var saved = localStorage.getItem(DETECTION_MODE_KEY);
+          if (Object.prototype.hasOwnProperty.call(DETECTION_MODES, saved)) {
+            return saved;
+          }
+          var legacy = localStorage.getItem("soul-rider-use-pc-yolo");
+          if (legacy === "0") return "four_point";
+          if (legacy === "1") return "yolo";
+          return null;
+        } catch (_) {
+          return null;
+        }
+      }
+
+      function applyDetectionMode(mode, persist) {
+        currentDetectionMode = Object.prototype.hasOwnProperty.call(DETECTION_MODES, mode)
+          ? mode
+          : "yolo";
+        frozen = false;
+        frozenState = null;
+        document.getElementById("freeze-frame").textContent = "冻结画面";
+        setActiveModeTab();
+        if (persist) {
+          try {
+            localStorage.setItem(DETECTION_MODE_KEY, currentDetectionMode);
+          } catch (_) {}
+        }
+        clearBBoxAndPose();
+        statusEl.textContent = modeInfo().waiting;
+        statusEl.className = "status";
+        placeholder.textContent = modeInfo().waiting;
+        hasEdgeFrame = false;
+        frameEl.removeAttribute("src");
+        frameEl.style.display = "none";
+        document.getElementById("act-action").textContent = "None";
+        document.getElementById("def-action").textContent = "None";
+        clearTimeout(actActionTimer);
+        clearTimeout(bodyActionTimer);
+        lastFrameSeq = 0;
+        syncLayerVisibility();
+      }
+
+      async function syncDetectionModeToBridge() {
+        var requestId = ++detectionModeRequest;
+        var mode = currentDetectionMode;
+        lastDetectionModeSyncAt = Date.now();
+        try {
+          var response = await fetch(API + "/api/detection-mode", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mode: mode })
+          });
+          var payload = await response.json().catch(function () { return {}; });
+          if (!response.ok || payload.ok === false) {
+            throw new Error(payload.error || "detection mode request failed");
+          }
+          if (
+            payload.expected_kind != null &&
+            Number(payload.expected_kind) !== modeInfo().kind
+          ) {
+            throw new Error("unexpected detection kind");
+          }
+          return requestId === detectionModeRequest;
+        } catch (_) {
+          if (requestId === detectionModeRequest) {
+            statusEl.textContent = "无法切换到 " + modeInfo().label;
+            statusEl.className = "status bad";
+          }
+          return false;
+        }
+      }
+
+      function display(value) {
+        return value === null || value === undefined || value === ""
+          ? "--"
+          : String(value);
+      }
+
+      function showActAction(triggerAction) {
+        var actAction = "None";
+        if (triggerAction === "left" || triggerAction === "left_overhead") {
+          actAction = "左攻击";
+        } else if (triggerAction === "right" || triggerAction === "right_overhead") {
+          actAction = "右攻击";
+        }
+        document.getElementById("act-action").textContent = actAction;
+        clearTimeout(actActionTimer);
+        if (actAction !== "None") {
+          actActionTimer = setTimeout(function () {
+            document.getElementById("act-action").textContent = "None";
+          }, ACT_ACTION_DURATION_MS);
+        }
+      }
+
+      function showBodyAction(triggerAction) {
+        var bodyAction = "None";
+        if (triggerAction === "squat") {
+          bodyAction = "下蹲防御";
+        }
+        document.getElementById("def-action").textContent = bodyAction;
+        clearTimeout(bodyActionTimer);
+        if (bodyAction !== "None") {
+          bodyActionTimer = setTimeout(function () {
+            document.getElementById("def-action").textContent = "None";
+          }, BODY_ACTION_DURATION_MS);
+        }
+      }
+
+      function selectPanel(name, updateHash) {
+        diagnosticTabs.forEach(function (tab) {
+          var active = tab.dataset.panel === name;
+          tab.classList.toggle("active", active);
+          tab.setAttribute("aria-selected", String(active));
+        });
+        diagnosticPanels.forEach(function (panel) {
+          panel.hidden = panel.dataset.panelContent !== name;
+        });
+        if (updateHash !== false && location.hash !== "#panel-" + name) {
+          history.replaceState(null, "", "#panel-" + name);
+        }
+      }
+
+      function setHealthPill(id, text, state) {
+        var element = document.getElementById(id);
+        if (!element) return;
+        element.textContent = text;
+        element.className = "health-pill" + (state ? " " + state : "");
+      }
+
+      function numeric(value, digits) {
+        var number = Number(value);
+        if (!Number.isFinite(number)) return "--";
+        return number.toFixed(digits == null ? 1 : digits);
+      }
+
+      function renderArmGauge(side, state) {
+        var debug = state.debug || {};
+        var arm = debug[side + "_arm"] || (state.arms && state.arms[side]) || {};
+        var gesture = debug.gesture || {};
+        var action = side === "left" ? "left" : "right";
+        var votes =
+          gesture.candidate === action
+            ? Number(gesture.candidate_frames || 0)
+            : 0;
+        var minVotes = gesture.min_votes == null ? "--" : gesture.min_votes;
+        var cooldown = Number(gesture.cooldown_remaining_ms || 0);
+        var rise = Number(arm.rise_px);
+        var threshold = Number(arm.rise_threshold_px);
+        var wristRise = Number(arm.wrist_rise_px);
+        var wristThreshold = Number(arm.wrist_rise_threshold_px);
+        var wristOffset = Number(arm.wrist_below_elbow_px);
+        var wristLimit = arm.wrist_offset_limit_px == null
+          ? null
+          : Number(arm.wrist_offset_limit_px);
+        var ready = !!arm.filter_ready;
+        var valid = !!arm.valid;
+        var gaugeState = document.getElementById(side + "-gauge-state");
+
+        document.getElementById(side + "-baseline").textContent =
+          arm.baseline_y_px == null ? "--" : numeric(arm.baseline_y_px) + " px";
+        document.getElementById(side + "-current").textContent =
+          arm.filtered_y_px == null ? "--" : numeric(arm.filtered_y_px) + " px";
+        document.getElementById(side + "-rise").textContent =
+          Number.isFinite(rise) ? numeric(rise) + " / " + numeric(threshold) + " px" : "--";
+        document.getElementById(side + "-threshold").textContent =
+          Number.isFinite(threshold) ? numeric(threshold) + " px" : "--";
+        document.getElementById(side + "-wrist-rise").textContent =
+          Number.isFinite(wristRise) && Number.isFinite(wristThreshold)
+            ? numeric(wristRise) + " / " + numeric(wristThreshold) + " px"
+            : "--";
+        document.getElementById(side + "-wrist-offset").textContent =
+          Number.isFinite(wristOffset)
+            ? numeric(wristOffset) + (
+                wristLimit == null ? "" : " / " + numeric(wristLimit)
+              ) + " px"
+            : "--";
+        document.getElementById(side + "-votes").textContent =
+          gesture.candidate === action
+            ? votes + " / " + minVotes
+            : "0 / " + minVotes;
+        document.getElementById(side + "-cooldown").textContent =
+          cooldown > 0 ? cooldown + " ms" : "就绪";
+
+        var meter = document.getElementById(side + "-rise-meter");
+        var ratio = Number.isFinite(rise) && threshold > 0
+          ? Math.max(0, Math.min(100, rise / threshold * 100))
+          : 0;
+        meter.style.width = ratio.toFixed(1) + "%";
+        meter.className = valid ? "ok" : ready ? "" : "bad";
+        gaugeState.textContent = !ready
+          ? "收集中"
+          : valid
+            ? "已抬起"
+            : "未触发";
+        if (ready && !valid && arm.elbow_valid && !arm.wrist_valid) {
+          gaugeState.textContent = "等待手腕";
+        }
+        gaugeState.className =
+          "gauge-state " + (valid ? "ok" : ready ? "" : "bad");
+      }
+
+      function renderDecision(state) {
+        var debug = state.debug || {};
+        var pipeline = debug.pipeline || {};
+        var stage = pipeline.blocked_stage || "none";
+        var labels = {
+          none: "可以攻击",
+          person_not_detected: "没有检测到完整人体",
+          pose_not_stable: "骨架尚未稳定，正在收集有效人体",
+          calibrating: "正在校准，校准期间不会产生攻击事件",
+          squat_active: "下蹲动作中，攻击被暂停",
+          post_squat_gate: "下蹲后等待恢复中立姿势",
+          gesture_votes: "动作已识别，但确认票数不足",
+          attack_cooldown: "动作已确认，但攻击仍在冷却",
+          event_emitted: "已生成攻击事件",
+          frame_invalid: "当前帧关键点或数据无效",
+          human_confidence_below_threshold: "人体置信度不足，动作判定被拦截",
+          model_warming_up: "人体与抬手模型正在收集窗口",
+          model_rule_conflict: "成熟规则与模型方向冲突，攻击被拦截",
+          combined_confidence_below_threshold: "融合抬手置信度不足，攻击被拦截",
+          stream_waiting: "等待有效数据帧"
+        };
+        var cssClass = stage === "event_emitted"
+          ? "ok"
+          : stage === "none"
+            ? ""
+            : [
+                "gesture_votes",
+                "attack_cooldown",
+                "calibrating",
+                "pose_not_stable"
+              ].indexOf(stage) >= 0
+              ? "warn"
+              : "bad";
+        var element = document.getElementById("decision-summary");
+        element.className = "decision " + cssClass;
+        element.innerHTML =
+          "<strong>" + (labels[stage] || stage) + "</strong><br />" +
+          "动作：" + display(pipeline.attack_action || state.action) +
+          " · 身体：" + display(pipeline.body_action || state.body_action) +
+          " · 事件序号：" + display(pipeline.action_seq == null ? state.action_seq : pipeline.action_seq) +
+          "<br />trace：" + display(debug.trace_id);
+      }
+
+      function renderCalibration(state) {
+        var calibration = state.calibration || {};
+        var stateLabels = {
+          idle: "未开始",
+          collecting: "正在收集",
+          waiting_for_person: "等待人体",
+          waiting_for_neutral: "等待中立姿势",
+          ready: "校准完成",
+          timeout: "校准超时",
+          stream_lost: "链路中断"
+        };
+        var reasonLabels = {
+          not_started: "尚未开始",
+          waiting_for_neutral: "请双手自然下垂",
+          person_not_detected: "没有检测到人体",
+          insufficient_frames: "有效帧不足",
+          arms_not_neutral: "手臂尚未回到中立位置",
+          body_motion_detected: "检测到身体移动",
+          confirming_neutral: "正在确认中立姿势",
+          neutral_confirmed: "中立姿势稳定",
+          calibration_timeout: "校准超过最大时间",
+          game_inactive: "游戏未启动"
+        };
+        document.getElementById("calibration-state").textContent =
+          stateLabels[calibration.state] || display(calibration.state);
+        document.getElementById("calibration-reason").textContent =
+          reasonLabels[calibration.reason] || display(calibration.reason);
+        document.getElementById("calibration-frames").textContent =
+          display(calibration.neutral_frames) + " / " +
+          display(calibration.required_frames);
+        document.getElementById("calibration-time").textContent =
+          display(calibration.elapsed_ms) + " / " +
+          display(calibration.timeout_ms) + " ms";
+        document.getElementById("calibration-progress").style.width =
+          Math.max(0, Math.min(1, Number(calibration.progress) || 0)) * 100 + "%";
+        var copy = document.getElementById("calibration-copy");
+        copy.className = "decision " + (
+          calibration.ready ? "ok" :
+          calibration.state === "timeout" || calibration.state === "stream_lost"
+            ? "bad" : "warn"
+        );
+        copy.textContent = calibration.ready
+          ? "校准完成。现在可以做出攻击动作。"
+          : reasonLabels[calibration.reason] ||
+            "请保持双手自然下垂，等待骨架稳定。";
+      }
+
+      function appendCell(row, text) {
+        var cell = document.createElement("td");
+        cell.textContent = text;
+        row.appendChild(cell);
+      }
+
+      function renderQuality(state) {
+        var debug = state.debug || {};
+        var quality = debug.quality || {};
+        var table = document.getElementById("quality-table");
+        table.innerHTML = "";
+        var threshold = Number(quality.keypoint_threshold);
+        document.getElementById("quality-reason").textContent =
+          display(quality.classifier_reason || state.reason);
+        document.getElementById("quality-source").textContent =
+          (Number.isFinite(threshold) ? threshold.toFixed(2) : "--") +
+          " / " + (isYoloMode() ? "YOLO confidence" : "FPGA heatmap score");
+
+        if (isYoloMode()) {
+          var points = Array.isArray(state.keypoints_xy) ? state.keypoints_xy : [];
+          var confidence = Array.isArray(state.keypoint_confidence)
+            ? state.keypoint_confidence
+            : [];
+          for (var index = 0; index < 17; index++) {
+            var point = Array.isArray(points[index]) ? points[index] : [NaN, NaN];
+            var score = Number(confidence[index]);
+            var required = index >= 5 && index <= 8;
+            var valid = Number.isFinite(score) && score >= threshold;
+            var row = document.createElement("tr");
+            row.className = valid ? "" : required ? "bad" : "warn";
+            appendCell(row, String(index));
+            appendCell(row, COCO_POINT_NAMES[index] + (required ? " *" : ""));
+            appendCell(row, numeric(point[0]));
+            appendCell(row, numeric(point[1]));
+            appendCell(row, numeric(score, 3));
+            appendCell(row, valid ? "有效" : required ? "必需点无效" : "低分");
+            table.appendChild(row);
+          }
+        } else {
+          var sourcePoints = Array.isArray(state.points) ? state.points : [];
+          sourcePoints.forEach(function (point, index) {
+            var score = Number(point.score);
+            var row = document.createElement("tr");
+            var required =
+              currentDetectionMode !== "eleven_point" ||
+              [1, 2, 3, 4, 5, 6].indexOf(index) >= 0;
+            var pointThreshold =
+              Number.isFinite(threshold) ? threshold : 0.12;
+            var valid = Number.isFinite(Number(point.x)) &&
+              Number.isFinite(Number(point.y)) &&
+              Number.isFinite(score) &&
+              score >= pointThreshold;
+            row.className = valid
+              ? ""
+              : required ? "bad" : "warn";
+            appendCell(row, String(index));
+            appendCell(row, display(point.name) + (required ? " *" : ""));
+            appendCell(row, numeric(point.x));
+            appendCell(row, numeric(point.y));
+            appendCell(row, Number.isFinite(score) ? numeric(score, 3) : "--");
+            appendCell(row, valid ? "有效" : "无效");
+            table.appendChild(row);
+          });
+          if (!sourcePoints.length) {
+            var empty = document.createElement("tr");
+            var emptyCell = document.createElement("td");
+            emptyCell.colSpan = 6;
+            emptyCell.textContent = "当前模式没有可用的关键点数据";
+            empty.appendChild(emptyCell);
+            table.appendChild(empty);
+          }
+        }
+      }
+
+      function renderLink(state, liveState) {
+        var stream = (liveState && liveState.stream) || state.stream || {};
+        var age = stateReceivedAt ? Math.max(0, Date.now() - stateReceivedAt) : null;
+        var healthy = !!liveState && !!liveState.stream_healthy;
+        document.getElementById("link-age").textContent =
+          age == null ? "--" : age + " ms";
+        document.getElementById("link-kind").textContent =
+          display(liveState && liveState.kind) + " / " +
+          display(liveState && liveState.expected_kind);
+        document.getElementById("link-frame").textContent =
+          display(liveState && liveState.frame_seq);
+        document.getElementById("link-fpga").textContent =
+          display(liveState && liveState.fpga_seq);
+        document.getElementById("link-crc").textContent =
+          display(stream.bad_payloads || 0);
+        document.getElementById("link-header").textContent =
+          display(stream.bad_headers || 0);
+        document.getElementById("link-gaps").textContent =
+          display(stream.sequence_gaps || 0);
+        document.getElementById("link-reopens").textContent =
+          display(liveState && liveState.stream_reopen_count);
+        document.getElementById("link-usb").textContent =
+          display(stream.usb_mb_s) + " MB/s";
+        document.getElementById("link-fps").textContent =
+          display(stream.fpga_fps);
+        var recovery = document.getElementById("link-recovery");
+        recovery.className = "decision " + (healthy ? "ok" : "bad");
+        recovery.textContent = healthy
+          ? "链路正常，持续收到有效数据。"
+          : "链路异常：" +
+            display((liveState && liveState.err) || "没有有效数据");
+        document.getElementById("full-state-json").textContent =
+          JSON.stringify(liveState || state, null, 2);
+        setHealthPill(
+          "health-frame",
+          "frame " + display(liveState && liveState.frame_seq),
+          healthy ? "ok" : "bad"
+        );
+        setHealthPill(
+          "health-link",
+          healthy ? "link ok" : "link wait",
+          healthy ? "ok" : "warn"
+        );
+      }
+
+      function renderDiagnostics(state, liveState) {
+        renderArmGauge("left", state);
+        renderArmGauge("right", state);
+        renderDecision(state);
+        renderCalibration(state);
+        renderQuality(state);
+        renderLink(state, liveState);
+      }
+
+      function toggleFreeze() {
+        frozen = !frozen;
+        if (frozen && liveState) {
+          frozenState = JSON.parse(JSON.stringify(liveState));
+        } else {
+          frozenState = null;
+        }
+        document.getElementById("freeze-frame").textContent =
+          frozen ? "恢复实时" : "冻结画面";
+        var badge = document.getElementById("freeze-badge");
+        badge.className = "preview-badge" + (frozen ? " frozen" : "");
+        badge.textContent = frozen
+          ? "FROZEN · frame " + display(frozenState && frozenState.frame_seq)
+          : "LIVE · frame " + display(liveState && liveState.frame_seq);
+        if (liveState) {
+          renderDiagnostics(frozen ? frozenState : liveState, liveState);
+        }
+      }
+
+      function setTuningValue(key, value) {
+        var control = tuningControls[key];
+        if (!control) return;
+        if (control.type === "bool") {
+          control.checkbox.checked = Number(value) !== 0;
+          return;
+        }
+        control.range.value = value;
+        control.number.value = value;
+      }
+
+      function renderTuning(data) {
+        var list = document.getElementById("tune-list");
+        list.innerHTML = "";
+        tuningControls = {};
+        (data.controls || []).forEach(function (control) {
+          var item = document.createElement("div");
+          item.className = "tune-item";
+          var head = document.createElement("div");
+          head.className = "tune-head";
+          var label = document.createElement("span");
+          label.textContent = control.label;
+          var rangeValue = document.createElement("span");
+          rangeValue.textContent = control.value;
+          head.appendChild(label);
+          head.appendChild(rangeValue);
+          var controls = document.createElement("div");
+          controls.className = "tune-controls";
+          if (control.type === "bool") {
+            var checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.checked = Number(control.value) !== 0;
+            rangeValue.textContent = checkbox.checked ? "开启" : "关闭";
+            checkbox.addEventListener("change", function () {
+              rangeValue.textContent = checkbox.checked ? "开启" : "关闭";
+            });
+            controls.appendChild(checkbox);
+            item.appendChild(head);
+            item.appendChild(controls);
+            list.appendChild(item);
+            tuningControls[control.key] = {
+              checkbox: checkbox,
+              type: control.type
+            };
+            return;
+          }
+          var range = document.createElement("input");
+          range.type = "range";
+          range.min = control.min;
+          range.max = control.max;
+          range.step = control.step;
+          range.value = control.value;
+          var number = document.createElement("input");
+          number.type = "number";
+          number.min = control.min;
+          number.max = control.max;
+          number.step = control.step;
+          number.value = control.value;
+          function sync(source, target) {
+            target.value = source.value;
+            rangeValue.textContent = source.value;
+          }
+          range.addEventListener("input", function () {
+            sync(range, number);
+          });
+          number.addEventListener("input", function () {
+            sync(number, range);
+          });
+          controls.appendChild(range);
+          controls.appendChild(number);
+          item.appendChild(head);
+          item.appendChild(controls);
+          list.appendChild(item);
+          tuningControls[control.key] = {
+            range: range,
+            number: number,
+            type: control.type
+          };
+        });
+        tuningLoaded = true;
+      }
+
+      function collectTuning() {
+        var values = {};
+        Object.keys(tuningControls).forEach(function (key) {
+          var control = tuningControls[key];
+          if (control.type === "bool") {
+            values[key] = control.checkbox.checked ? 1 : 0;
+          } else {
+            values[key] = control.type === "int"
+              ? parseInt(control.number.value, 10)
+              : parseFloat(control.number.value);
+          }
+        });
+        return values;
+      }
+
+      async function loadTuning(force) {
+        if (tuningLoaded && !force) return;
+        try {
+          var response = await fetch(API + "/api/debug/config", { cache: "no-store" });
+          var data = await response.json();
+          if (!response.ok || !data.ok) throw new Error(data.error || "load failed");
+          renderTuning(data);
+        } catch (error) {
+          document.getElementById("tuning-message").textContent =
+            "参数加载失败：" + error.message;
+          document.getElementById("tuning-message").className =
+            "inline-message bad";
+        }
+      }
+
+      async function applyTuning(persist) {
+        var message = document.getElementById("tuning-message");
+        message.textContent = "正在应用...";
+        message.className = "inline-message";
+        try {
+          var response = await fetch(API + "/api/debug/config/apply", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ values: collectTuning(), persist: persist })
+          });
+          var data = await response.json();
+          if (!response.ok || !data.ok) throw new Error(data.error || "apply failed");
+          message.textContent = persist
+            ? "参数已应用并保存为默认值，同时重新开始校准。"
+            : "参数已临时应用，同时重新开始校准。";
+          message.className = "inline-message ok";
+          await loadTuning(true);
+        } catch (error) {
+          message.textContent = error.message;
+          message.className = "inline-message bad";
+        }
+      }
+
+      async function resetTuning() {
+        var message = document.getElementById("tuning-message");
+        message.textContent = "正在恢复默认值...";
+        message.className = "inline-message";
+        try {
+          var response = await fetch(API + "/api/debug/config/reset", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ persist: false })
+          });
+          var data = await response.json();
+          if (!response.ok || !data.ok) throw new Error(data.error || "reset failed");
+          message.textContent = "临时参数已恢复默认值，并重新开始校准。";
+          message.className = "inline-message ok";
+          await loadTuning(true);
+        } catch (error) {
+          message.textContent = error.message;
+          message.className = "inline-message bad";
+        }
+      }
+
+      function eventIsVisible(event) {
+        var filter = document.getElementById("event-filter").value;
+        if (filter === "all") return true;
+        var blocked = [
+          "attack_blocked",
+          "calibration_requested",
+          "debug_tuning_applied",
+          "read_failed",
+          "open_failed"
+        ];
+        if (filter === "blocked") {
+          return blocked.indexOf(event.event) >= 0 ||
+            event.reason === "post_squat_attack_gate" ||
+            event.attack_gated === true;
+        }
+        return [
+          "session_started",
+          "session_ended",
+          "game_activity_changed",
+          "action_recognized",
+          "event_emitted",
+          "attack_blocked",
+          "attack_started",
+          "game_received",
+          "calibration_requested",
+          "debug_tuning_applied",
+          "source_opened",
+          "source_reopened",
+          "read_failed",
+          "open_failed",
+          "page_attached",
+          "debug_page_attached"
+        ].indexOf(event.event) >= 0;
+      }
+
+      function eventStage(event) {
+        if (event.attack_gated) return "门控";
+        if (event.event === "event_emitted") return "已触发";
+        if (event.event === "attack_blocked") return "拦截";
+        if (event.event === "action_recognized") {
+          return event.triggered ? "确认" : display(event.attack_action || event.action);
+        }
+        return event.stream || "";
+      }
+
+      function renderEvents() {
+        var list = document.getElementById("event-list");
+        list.innerHTML = "";
+        var shown = debugEvents.filter(eventIsVisible).slice(-80).reverse();
+        if (!shown.length) {
+          var empty = document.createElement("div");
+          empty.className = "inline-message";
+          empty.textContent = "当前过滤条件下没有事件。";
+          list.appendChild(empty);
+          return;
+        }
+        shown.forEach(function (event) {
+          var row = document.createElement("button");
+          row.type = "button";
+          row.className = "event-row";
+          var time = document.createElement("span");
+          var date = new Date(event.ts);
+          time.textContent = Number.isNaN(date.getTime())
+            ? "--"
+            : date.toLocaleTimeString("zh-CN", { hour12: false });
+          var name = document.createElement("span");
+          name.className = "event-name";
+          name.textContent = event.event || "unknown";
+          var stage = document.createElement("span");
+          stage.className = "event-stage";
+          stage.textContent = eventStage(event);
+          row.appendChild(time);
+          row.appendChild(name);
+          row.appendChild(stage);
+          row.addEventListener("click", function () {
+            selectedEventId = event.event_id;
+            document.getElementById("event-json").textContent =
+              JSON.stringify(event, null, 2);
+            Array.prototype.forEach.call(list.children, function (item) {
+              item.classList.toggle("selected", item === row);
+            });
+          });
+          list.appendChild(row);
+        });
+      }
+
+      async function attachDebugSession() {
+        if (sessionAttached) return;
+        try {
+          var response = await fetch(API + "/api/session/attach", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: "{}"
+          });
+          var data = await response.json();
+          if (!data.ok || typeof data.test_session_id !== "number") return;
+          sessionAttached = true;
+          await fetch(API + "/api/log/game", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              event: "debug_page_attached",
+              log_session_id: data.test_session_id,
+              client_ts: new Date().toISOString(),
+              client_perf_ms: performance.now(),
+              data: {
+                page: location.href,
+                user_agent: navigator.userAgent
+              }
+            })
+          });
+        } catch (_) {}
+      }
+
+      async function pollEvents() {
+        try {
+          var response = await fetch(
+            API + "/api/debug/events?after_event_id=" +
+            lastDebugEventId + "&limit=250",
+            { cache: "no-store" }
+          );
+          var data = await response.json();
+          if (!response.ok || !data.ok) return;
+          (data.events || []).forEach(function (event) {
+            lastDebugEventId = Math.max(
+              lastDebugEventId,
+              Number(event.event_id) || 0
+            );
+            if (!debugEvents.some(function (item) {
+              return item.event_id === event.event_id;
+            })) {
+              debugEvents.push(event);
+            }
+          });
+          debugEvents = debugEvents.slice(-500);
+          renderEvents();
+        } catch (_) {}
+      }
+
+      async function recalibrate() {
+        try {
+          var response = await fetch(API + "/api/debug/recalibrate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ reason: "debug_page" })
+          });
+          var data = await response.json();
+          if (!response.ok || !data.ok) {
+            throw new Error(data.error || "calibration failed");
+          }
+          selectPanel("calibration");
+        } catch (error) {
+          statusEl.textContent = "重新校准失败：" + error.message;
+          statusEl.className = "status bad";
+        }
+      }
+
+      async function exportDiagnostics() {
+        var button = document.getElementById("export-diagnostics");
+        button.disabled = true;
+        button.textContent = "导出中...";
+        try {
+          var response = await fetch(API + "/api/debug/export?window_s=10", {
+            cache: "no-store"
+          });
+          if (!response.ok) throw new Error("export failed");
+          var data = await response.json();
+          var blob = new Blob([JSON.stringify(data, null, 2)], {
+            type: "application/json"
+          });
+          var link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          link.download =
+            "soulrider_diagnostic_" +
+            new Date().toISOString().replace(/[:.]/g, "-") +
+            ".json";
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          setTimeout(function () { URL.revokeObjectURL(link.href); }, 1000);
+        } catch (error) {
+          statusEl.textContent = "诊断导出失败：" + error.message;
+          statusEl.className = "status bad";
+        } finally {
+          button.disabled = false;
+          button.textContent = "导出最近10秒";
+        }
+      }
+
+      async function startCapture() {
+        try {
+          await syncDetectionModeToBridge();
+          await fetch(API + "/api/game-start", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: "{}"
+          });
+        } catch (_) {
+          if (isYoloMode()) {
+            setConnection(false, "无法启动识别服务");
+          } else {
+            statusEl.textContent = modeInfo().waiting;
+            statusEl.className = "status";
+          }
+        }
+      }
+
+      async function stopCapture() {
+        if (leaving) return;
+        leaving = true;
+        clearInterval(pollTimer);
+        try {
+          await fetch(API + "/api/game-stop", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: "{}",
+            keepalive: true
+          });
+        } catch (_) {}
+        window.location.href = "index.html";
+      }
+
+      async function poll() {
+        if (pollInFlight) return;
+        pollInFlight = true;
+        var controller = new AbortController();
+        var timeout = setTimeout(function () { controller.abort(); }, 1500);
+        try {
+          var response = await fetch(API + "/state", {
+            cache: "no-store",
+            signal: controller.signal
+          });
+          var state = await response.json();
+          stateReceivedAt = Date.now();
+          liveState = state;
+          var ok = !!state.ok && !state.err;
+          if (
+            state.detection_mode &&
+            state.detection_mode !== currentDetectionMode &&
+            Date.now() - lastDetectionModeSyncAt > 1200
+          ) {
+            syncDetectionModeToBridge();
+          }
+          var modeState =
+            ok && state.detection_mode === currentDetectionMode;
+          if (!frozen) {
+            frozenState = null;
+            if (isYoloMode() && modeState) {
+              drawBBox(state);
+              drawPose(state);
+            } else if (!isYoloMode() && modeState) {
+              bboxHasData = false;
+              setSvgVisible(bboxLayer, false);
+              drawPose(state);
+            } else {
+              clearBBoxAndPose();
+            }
+            if (
+              isYoloMode() &&
+              modeState &&
+              typeof state.frame_seq === "number" &&
+              state.frame_seq !== lastFrameSeq
+            ) {
+              lastFrameSeq = state.frame_seq;
+              frameEl.src = API + "/edge.png?t=" + Date.now();
+            } else if (!isYoloMode()) {
+              lastFrameSeq = 0;
+              hasEdgeFrame = false;
+              frameEl.removeAttribute("src");
+              frameEl.style.display = "none";
+              placeholder.textContent = modeInfo().waiting;
+            }
+            syncLayerVisibility();
+          }
+
+          var displayState = frozen && frozenState ? frozenState : state;
+          setConnection(
+            ok,
+            ok
+              ? (modeState
+                  ? modeInfo().label + " · 实时诊断"
+                  : "数据模式与页面选择不一致")
+              : (state.err || modeInfo().waiting)
+          );
+          setHealthPill(
+            "health-connection",
+            ok ? "bridge ok" : "bridge error",
+            ok ? "ok" : "bad"
+          );
+          document.getElementById("action").textContent =
+            display(displayState.action);
+          document.getElementById("body-action").textContent =
+            display(displayState.body_action);
+          var shoulderMotion = displayState.shoulder_motion || {};
+          document.getElementById("squat-speed").textContent =
+            shoulderMotion.speed_ready
+              ? Number(shoulderMotion.left_speed_ratio_s).toFixed(2) +
+                " / " +
+                Number(shoulderMotion.right_speed_ratio_s).toFixed(2) +
+                " 肩宽/s"
+              : "等待速度窗口";
+          document.getElementById("hip-speed").textContent =
+            shoulderMotion.hip_speed_ready
+              ? Number(shoulderMotion.left_hip_speed_ratio_s).toFixed(2) +
+                " / " +
+                Number(shoulderMotion.right_hip_speed_ratio_s).toFixed(2) +
+                " 肩宽/s"
+              : shoulderMotion.hips_available
+                ? "等待髋部速度窗口"
+                : "髋点不可用";
+          document.getElementById("hip-drop").textContent =
+            shoulderMotion.hips_available
+              ? display(shoulderMotion.mean_hip_shift_px) + " / " +
+                display(shoulderMotion.hip_min_drop_px) + " px"
+              : "--";
+          document.getElementById("lower-body-confirmed").textContent =
+            shoulderMotion.lower_body_confirmed ? "是" : "否";
+          var humanConfidence = Number(displayState.human_confidence);
+          document.getElementById("human-confidence").textContent =
+            Number.isFinite(humanConfidence)
+              ? (humanConfidence * 100).toFixed(1) + "%"
+              : "--";
+          var raiseConfidence = Number(displayState.raise_confidence);
+          document.getElementById("raise-confidence").textContent =
+            Number.isFinite(raiseConfidence)
+              ? (raiseConfidence * 100).toFixed(1) + "%"
+              : "--";
+          var armProbabilities = displayState.arm_probabilities || {};
+          document.getElementById("arm-probabilities").textContent =
+            Object.keys(armProbabilities).length
+              ? "L " + (Number(armProbabilities.left_raise || 0) * 100).toFixed(1) +
+                "% · R " + (Number(armProbabilities.right_raise || 0) * 100).toFixed(1) +
+                "% · N " + (Number(armProbabilities.no_raise || 0) * 100).toFixed(1) + "%"
+              : "--";
+          document.getElementById("rule-model-side").textContent =
+            display(displayState.rule_side) + " / " + display(displayState.model_side) +
+            (displayState.model_rule_conflict ? " · 冲突" : "");
+          var combinedConfidence = Number(displayState.combined_arm_confidence);
+          document.getElementById("combined-confidence").textContent =
+            Number.isFinite(combinedConfidence)
+              ? (combinedConfidence * 100).toFixed(1) + "%"
+              : "--";
+          document.getElementById("model-gate").textContent =
+            displayState.model_available === false
+              ? "模型不可用"
+              : displayState.model_gate_passed
+                ? "通过"
+                : display(displayState.model_gate_reason || "等待");
+          document.getElementById("model-window").textContent =
+            display(displayState.classifier_frames) + " / " +
+            display(displayState.classifier_window_size);
+          document.getElementById("inference-fps").textContent =
+            display(displayState.inference_fps);
+          document.getElementById("inference-ms").textContent =
+            displayState.inference_ms == null
+              ? (displayState.processing_ms == null
+                  ? "--"
+                  : displayState.processing_ms + " ms")
+              : displayState.inference_ms + " ms";
+          document.getElementById("fpga-fps").textContent =
+            display(displayState.stream && displayState.stream.fpga_fps);
+          document.getElementById("action-event-count").textContent =
+            display(displayState.action_seq || 0);
+
+          if (
+            typeof displayState.action_seq === "number" &&
+            (lastActionSeq === null || displayState.action_seq > lastActionSeq)
+          ) {
+            lastActionSeq = displayState.action_seq;
+            showActAction(displayState.trigger_action || displayState.action);
+          }
+
+          if (
+            typeof displayState.body_action_seq === "number" &&
+            (lastBodyActionSeq === null ||
+              displayState.body_action_seq > lastBodyActionSeq)
+          ) {
+            lastBodyActionSeq = displayState.body_action_seq;
+            showBodyAction(
+              displayState.trigger_body_action || displayState.body_action
+            );
+          }
+
+          renderDiagnostics(displayState, state);
+          var badge = document.getElementById("freeze-badge");
+          badge.className = "preview-badge" + (frozen ? " frozen" : "");
+          badge.textContent = frozen
+            ? "FROZEN · frame " + display(state.frame_seq) +
+              " / live " + display(liveState.frame_seq)
+            : "LIVE · frame " + display(state.frame_seq);
+        } catch (_) {
+          clearBBoxAndPose();
+          syncLayerVisibility();
+          setConnection(false, "识别服务已断开");
+          setHealthPill("health-connection", "bridge offline", "bad");
+          setHealthPill("health-frame", "frame --", "bad");
+          setHealthPill("health-link", "link offline", "bad");
+        } finally {
+          clearTimeout(timeout);
+          pollInFlight = false;
+        }
+      }
+
+      document.getElementById("back").addEventListener("click", stopCapture);
+      diagnosticTabs.forEach(function (tab) {
+        tab.addEventListener("click", function () {
+          selectPanel(tab.dataset.panel);
+          if (tab.dataset.panel === "tuning") loadTuning(false);
+        });
+      });
+      modeTabs.forEach(function (tab) {
+        tab.addEventListener("click", function () {
+          var mode = tab.dataset.detectionMode;
+          applyDetectionMode(mode, true);
+          syncDetectionModeToBridge();
+        });
+      });
+      [edgeToggle, bboxToggle, poseToggle].forEach(function (toggle) {
+        toggle.addEventListener("change", syncLayerVisibility);
+      });
+      document.getElementById("freeze-frame").addEventListener("click", toggleFreeze);
+      document.getElementById("export-diagnostics").addEventListener("click", exportDiagnostics);
+      document.getElementById("recalibrate").addEventListener("click", recalibrate);
+      document.getElementById("apply-tuning").addEventListener("click", function () {
+        applyTuning(false);
+      });
+      document.getElementById("save-tuning").addEventListener("click", function () {
+        applyTuning(true);
+      });
+      document.getElementById("reset-tuning").addEventListener("click", resetTuning);
+      document.getElementById("event-filter").addEventListener("change", renderEvents);
+      document.getElementById("clear-events").addEventListener("click", function () {
+        debugEvents = [];
+        selectedEventId = null;
+        document.getElementById("event-json").textContent =
+          "选择一条事件查看详情。";
+        renderEvents();
+      });
+      frameEl.addEventListener("load", function () {
+        hasEdgeFrame = true;
+        syncLayerVisibility();
+      });
+      frameEl.addEventListener("error", function () {
+        hasEdgeFrame = false;
+        syncLayerVisibility();
+      });
+      window.addEventListener("storage", function (event) {
+        if (event.key === DETECTION_MODE_KEY) {
+          applyDetectionMode(event.newValue, false);
+          syncDetectionModeToBridge();
+        }
+      });
+      window.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          stopCapture();
+        }
+      });
+      window.addEventListener("pagehide", function () {
+        if (leaving) return;
+        var body = new Blob(["{}"], { type: "application/json" });
+        navigator.sendBeacon(API + "/api/game-stop", body);
+      });
+
+      buildPoseElements();
+      var initialPanel = location.hash.replace(/^#panel-/, "") || "action";
+      if (!document.querySelector('[data-panel-content="' + initialPanel + '"]')) {
+        initialPanel = "action";
+      }
+      selectPanel(initialPanel, false);
+      (async function initializeDebugPage() {
+        var mode = readDetectionMode();
+        if (!mode) {
+          try {
+            var response = await fetch(API + "/state", { cache: "no-store" });
+            var state = await response.json();
+            if (Object.prototype.hasOwnProperty.call(
+              DETECTION_MODES,
+              state.detection_mode
+            )) {
+              mode = state.detection_mode;
+            }
+          } catch (_) {}
+        }
+        applyDetectionMode(mode || "eleven_point", false);
+        await attachDebugSession();
+        loadTuning(false);
+        pollEvents();
+        setInterval(pollEvents, 1000);
+        await startCapture();
+        poll();
+        pollTimer = setInterval(poll, 100);
+      })();
+    })();
+  </script>
+</body>
+</html>

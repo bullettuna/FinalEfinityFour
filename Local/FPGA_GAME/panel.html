@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Soul Rider Demo Input</title>
+  <style>
+    :root { --bg:#11151b; --panel:#1b222b; --line:#34404f; --text:#e8edf2; --muted:#93a1b3; --gold:#d6b25e; --ok:#42d392; --bad:#ef6262; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font-family:Segoe UI,Microsoft YaHei,sans-serif; }
+    header { padding:14px 20px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; gap:18px; flex-wrap:wrap; }
+    h1 { margin:0; font-size:20px; letter-spacing:.04em; }
+    a, button { font:inherit; }
+    button { background:#263140; color:var(--text); border:1px solid var(--line); padding:8px 12px; border-radius:4px; cursor:pointer; }
+    button:hover { border-color:var(--gold); }
+    button:disabled { cursor:not-allowed; opacity:.45; }
+    .mode-tabs { display:inline-grid; grid-template-columns:repeat(3,minmax(110px,1fr)); gap:4px; margin-top:10px; padding:4px; background:#0d1218; border:1px solid var(--line); border-radius:6px; }
+    .mode-tab { border-color:transparent; background:transparent; color:var(--muted); padding:7px 12px; }
+    .mode-tab.active { background:#263140; border-color:#4d5f73; color:var(--text); }
+    .mode-tab[aria-selected="true"] { box-shadow:inset 0 -2px 0 var(--gold); }
+    main { padding:18px; display:grid; gap:16px; grid-template-columns:minmax(0,1fr) 360px; }
+    .panel { background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:14px; }
+    .status-line { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:12px; color:var(--muted); }
+    .pill { padding:4px 8px; background:#111821; border:1px solid var(--line); border-radius:4px; }
+    .ok { color:var(--ok); } .bad { color:var(--bad); }
+    .images { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+    .images.live { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .images.debug { grid-template-columns:minmax(0,1fr); }
+    figure { margin:0; background:#070a0e; border:1px solid var(--line); }
+    figure img { width:100%; aspect-ratio:16/9; object-fit:contain; display:block; background:#000; }
+    figcaption { padding:6px 8px; color:var(--muted); font-size:13px; }
+    .form-row { display:flex; gap:8px; }
+    input[type=text] { flex:1; min-width:0; background:#10161e; border:1px solid var(--line); color:var(--text); padding:9px; border-radius:4px; }
+    .buttons { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+    dl { display:grid; grid-template-columns:110px 1fr; gap:8px 12px; margin:0; }
+    dt { color:var(--muted); } dd { margin:0; overflow-wrap:anywhere; }
+    #history { width:100%; border-collapse:collapse; margin-top:10px; font-size:12px; }
+    #history th, #history td { border-bottom:1px solid var(--line); padding:6px 4px; text-align:left; }
+    #history th { color:var(--muted); font-weight:500; }
+    .debug-panel { margin-top:14px; border-top:1px solid var(--line); padding-top:12px; }
+    .debug-meta { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+    .debug-meta span { padding:4px 8px; background:#111821; border:1px solid var(--line); border-radius:4px; color:var(--muted); font-size:12px; }
+    #points { width:100%; border-collapse:collapse; font-size:12px; }
+    #points th, #points td { border-bottom:1px solid var(--line); padding:6px 5px; text-align:right; }
+    #points th:first-child, #points td:first-child { text-align:left; }
+    #points th { color:var(--muted); font-weight:500; }
+    @media(max-width:1000px){ main{grid-template-columns:1fr}.images{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Soul Rider · 姿态调试桥接</h1>
+      <nav id="modeTabs" class="mode-tabs" role="tablist" aria-label="检测模式">
+        <button class="mode-tab active" data-detection-mode="yolo" role="tab" aria-selected="true">YOLO</button>
+        <button class="mode-tab" data-detection-mode="four_point" role="tab" aria-selected="false">四点检测</button>
+        <button class="mode-tab" data-detection-mode="eleven_point" role="tab" aria-selected="false">十一点检测</button>
+      </nav>
+    </div>
+    <a href="/game/" target="_blank"><button>打开游戏</button></a>
+  </header>
+  <main>
+    <section class="panel">
+      <div class="status-line">
+        <span id="conn" class="pill bad">等待输入目录</span>
+        <span id="source" class="pill">输入源 --</span>
+        <span id="index" class="pill">0 / 0</span>
+        <span id="paused" class="pill">运行中</span>
+        <span id="fps" class="pill">处理 -- fps</span>
+      </div>
+      <div class="images">
+        <figure id="original-figure"><img id="original" alt="原始图片"><figcaption>当前原图</figcaption></figure>
+        <figure id="edge-figure"><img id="edge" alt="FPGA 边缘图"><figcaption>FPGA 边缘图</figcaption></figure>
+        <figure id="pose-figure"><img id="pose" alt="姿态结果"><figcaption id="pose-caption">YOLO 17 点结果</figcaption></figure>
+      </div>
+      <section id="debugPanel" class="debug-panel" hidden>
+        <div class="debug-meta">
+          <span id="debugVersion">version --</span>
+          <span id="debugFlags">flags --</span>
+          <span id="debugLive">live --</span>
+          <span id="debugCycles">cycles --</span>
+          <span id="debugNetMs">net -- ms</span>
+          <span id="debugModel">model --</span>
+          <span id="debugInput">input --</span>
+          <span id="debugHeatmap">heatmap --</span>
+          <span id="debugClassifier">classifier --</span>
+        </div>
+        <table id="points">
+          <thead><tr><th>关键点</th><th>x</th><th>y</th><th>peak</th><th>score</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </section>
+      <table id="history">
+        <thead><tr><th>#</th><th>图片</th><th>动作</th><th>框置信度</th><th>原因</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+    <aside class="panel">
+      <div id="folderControls">
+        <h2 style="font-size:16px;margin-top:0">输入文件夹</h2>
+        <div class="form-row">
+          <input id="folder" type="text" placeholder="例如 D:\images\pose_demo">
+          <button id="setFolder">载入</button>
+        </div>
+        <p style="color:var(--muted);font-size:13px">所有文件都会重新执行 FPGA image5 边缘检测，不区分原图或已有边缘图。</p>
+      </div>
+      <div class="buttons">
+        <button data-command="pause">暂停</button>
+        <button data-command="resume">继续</button>
+        <button data-command="prev">上一张</button>
+        <button data-command="next">下一张</button>
+        <button data-command="restart">重播</button>
+      </div>
+      <h2 style="font-size:16px;margin-top:20px">当前识别</h2>
+      <dl>
+        <dt>图片</dt><dd id="image">--</dd>
+        <dt>动作</dt><dd id="action">--</dd>
+        <dt>姿势 ID</dt><dd id="poseId">--</dd>
+        <dt>人体框</dt><dd id="bboxConf">--</dd>
+        <dt>横向位置</dt><dd id="cx">--</dd>
+        <dt>判定原因</dt><dd id="reason">--</dd>
+        <dt>错误</dt><dd id="error">--</dd>
+      </dl>
+    </aside>
+  </main>
+  <script>
+    const $ = id => document.getElementById(id);
+    const MODE_LABELS = {
+      yolo: "YOLO",
+      four_point: "四点检测",
+      eleven_point: "十一点检测"
+    };
+    const POINT_LABELS = {
+      head: "头中心",
+      left_shoulder: "人物左肩",
+      right_shoulder: "人物右肩",
+      left_elbow: "人物左肘",
+      right_elbow: "人物右肘",
+      left_wrist: "人物左腕",
+      right_wrist: "人物右腕",
+      left_hip: "人物左髋",
+      right_hip: "人物右髋",
+      left_knee: "人物左膝",
+      right_knee: "人物右膝"
+    };
+    let lastFrame = 0;
+    let lastDetectionMode = "";
+    function setImage(id, url) {
+      const img = $(id);
+      img.src = url + "?t=" + Date.now();
+    }
+    function number(value, digits = 2) {
+      return value == null ? "--" : Number(value).toFixed(digits);
+    }
+    async function control(command) {
+      await fetch("/api/control", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({command}) });
+      await poll();
+    }
+    async function setDetectionMode(mode) {
+      const response = await fetch("/api/detection-mode", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({mode})
+      });
+      const data = await response.json();
+      if (!data.ok) $("error").textContent = data.error || "模式切换失败";
+      lastFrame = 0;
+      await poll();
+    }
+    async function setFolder() {
+      const path = $("folder").value.trim();
+      if (!path) return;
+      const response = await fetch("/api/input-dir", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({path}) });
+      const data = await response.json();
+      if (!data.ok) $("error").textContent = data.error || "目录载入失败";
+      await poll();
+    }
+    async function poll() {
+      try {
+        const state = await (await fetch("/state", {cache:"no-store"})).json();
+        const live = state.source_mode === "ft232h";
+        const mode = state.detection_mode || "yolo";
+        const debug = mode !== "yolo";
+        const modeChanged = lastDetectionMode && lastDetectionMode !== mode;
+        lastDetectionMode = mode;
+        if (modeChanged) {
+          lastFrame = 0;
+          $("original").removeAttribute("src");
+          $("edge").removeAttribute("src");
+          $("pose").removeAttribute("src");
+        }
+        document.querySelectorAll("[data-detection-mode]").forEach(button => {
+          const selected = button.dataset.detectionMode === mode;
+          button.classList.toggle("active", selected);
+          button.setAttribute("aria-selected", String(selected));
+          button.disabled = state.source_mode !== "ft232h" && button.dataset.detectionMode !== "yolo";
+        });
+        const sourceName = live
+          ? `FPGA 640×360 kind${state.expected_kind || (debug ? (mode === "four_point" ? 4 : 5) : 3)}`
+          : "图片文件夹";
+        $("source").textContent = live ? `${sourceName} · ${MODE_LABELS[mode]}` : sourceName;
+        const waiting = String(state.err || "").startsWith("waiting_");
+        $("conn").textContent = state.ok
+          ? (debug ? "结果有效" : "桥接正常")
+          : (waiting ? "等待数据流" : (state.err || "未就绪"));
+        $("conn").className = "pill " + (state.ok ? "ok" : "bad");
+        $("folderControls").style.display = live ? "none" : "";
+        $("original-figure").style.display = (live || debug) ? "none" : "";
+        $("edge-figure").style.display = debug ? "none" : "";
+        $("pose-figure").style.display = "";
+        document.querySelector(".images").classList.toggle("live", live && !debug);
+        document.querySelector(".images").classList.toggle("debug", debug);
+        $("pose-caption").textContent = debug
+          ? `${MODE_LABELS[mode]} · 640×360 调试骨架`
+          : "YOLO 17 点结果";
+        $("debugPanel").hidden = !debug;
+        $("index").textContent = debug
+          ? `帧 ${state.frame_seq || 0}`
+          : (state.index || 0) + " / " + (state.total || 0);
+        $("paused").textContent = state.paused ? "已暂停" : "运行中";
+        $("fps").textContent = "处理 " + (state.inference_fps || state.processing_fps || "--") + " fps";
+        $("folder").value = state.input_dir || $("folder").value;
+        $("image").textContent = state.image || "--";
+        $("action").textContent = state.action_name || "站立";
+        $("poseId").textContent = state.pose_id || 1;
+        $("bboxConf").textContent = state.bbox_confidence == null ? "--" : Number(state.bbox_confidence).toFixed(4);
+        $("cx").textContent = state.cx == null ? "--" : Number(state.cx).toFixed(4);
+        $("reason").textContent = state.reason || "--";
+        $("error").textContent = state.err || "--";
+        document.querySelectorAll("[data-command]").forEach(button => {
+          button.disabled = live && ["prev", "next", "restart"].includes(button.dataset.command);
+        });
+
+        if (debug) {
+          $("debugVersion").textContent = `version ${state.version || "--"} / kind ${state.kind || "--"}`;
+          $("debugFlags").textContent = state.flags == null
+            ? "flags --"
+            : `flags 0x${Number(state.flags).toString(16).padStart(2, "0")}`;
+          $("debugLive").textContent = state.is_live == null
+            ? "live --"
+            : (state.is_live ? "实时输入" : "固定输入");
+          $("debugCycles").textContent = state.cycles == null ? "cycles --" : `cycles ${state.cycles}`;
+          $("debugNetMs").textContent = state.inference_ms == null ? "net -- ms" : `net ${number(state.inference_ms, 2)} ms`;
+          $("debugModel").textContent = state.model_crc_hex
+            ? `model ${state.model_crc_hex} · ${state.model_name || "unknown"}`
+            : "model --";
+          $("debugInput").textContent = state.input_crc_hex ? `input ${state.input_crc_hex}` : "input --";
+          $("debugHeatmap").textContent = state.heatmap_crc_hex ? `heatmap ${state.heatmap_crc_hex}` : "heatmap --";
+          $("debugClassifier").textContent = state.human_confidence == null
+            ? `classifier ${state.classifier_frames || 0}/${state.classifier_window_size || "--"}`
+            : `human ${number(state.human_confidence, 3)} · raise ${number(state.raise_confidence, 3)} · fused ${number(state.combined_arm_confidence, 3)}`;
+          const rows = (state.points || []).map(point => `
+            <tr>
+              <td>${POINT_LABELS[point.name] || point.name}</td>
+              <td>${number(point.x, 2)}</td>
+              <td>${number(point.y, 2)}</td>
+              <td>${point.peak ?? "--"}</td>
+              <td>${number(point.score, 6)}</td>
+            </tr>`).join("");
+          $("points").querySelector("tbody").innerHTML = rows;
+        }
+
+        if (state.frame_seq && state.frame_seq !== lastFrame) {
+          lastFrame = state.frame_seq;
+          if (!live && !debug) setImage("original", "/original.jpg");
+          if (!debug) setImage("edge", "/edge.png");
+          setImage("pose", "/frame.png");
+        }
+      } catch (error) {
+        $("conn").textContent = "桥接断开";
+        $("conn").className = "pill bad";
+      }
+      try {
+        const rows = await (await fetch("/history", {cache:"no-store"})).json();
+        $("history").querySelector("tbody").innerHTML = rows.slice().reverse().slice(0, 30).map(row =>
+          `<tr><td>${row.index}</td><td>${row.image || ""}</td><td>${row.action_name || "站立"}</td><td>${row.bbox_confidence ?? ""}</td><td>${row.reason || ""}</td></tr>`
+        ).join("");
+      } catch (_) {}
+    }
+    $("setFolder").addEventListener("click", setFolder);
+    document.querySelectorAll("[data-detection-mode]").forEach(button =>
+      button.addEventListener("click", () => setDetectionMode(button.dataset.detectionMode)));
+    document.querySelectorAll("[data-command]").forEach(button =>
+      button.addEventListener("click", () => control(button.dataset.command)));
+    poll();
+    setInterval(poll, 500);
+  </script>
+</body>
+</html>

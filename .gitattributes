@@ -41,3 +41,8 @@
 *.rpt    text
 *.html   text
 *.cmd    text
+
+# PC game assets and Windows launchers
+*.mp3 binary
+*.cmd text eol=crlf
+*.ps1 text eol=crlf

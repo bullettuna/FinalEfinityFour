@@ -1,0 +1,5 @@
+__pycache__/
+*.py[cod]
+/outputs/history.csv
+/outputs/live/
+/logs/
