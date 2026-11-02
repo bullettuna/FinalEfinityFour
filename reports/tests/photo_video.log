@@ -1,0 +1,33 @@
+#-----------------------------------------------------------
+# xsim v2024.2 (64-bit)
+# SW Build 5239630 on Fri Nov 08 22:35:27 MST 2024
+# IP Build 5239520 on Sun Nov 10 16:12:51 MST 2024
+# SharedData Build 5239561 on Fri Nov 08 14:39:27 MST 2024
+# Start of session at: Thu Oct 29 21:59:08 2026
+# Process ID         : 16880
+# Current directory  : E:/Efinity_Project/EfinityFPGAfour/work_sim/four_image/photo
+# Command line       : xsim.exe -log photo_video.log -mode tcl -source {xsim.dir/photo_video/xsim_script.tcl}
+# Log file           : E:/Efinity_Project/EfinityFPGAfour/work_sim/four_image/photo/photo_video.log
+# Journal file       : E:/Efinity_Project/EfinityFPGAfour/work_sim/four_image/photo\xsim.jou
+# Running On         : study_person
+# Platform           : Windows Server 2016 or Windows 10
+# Operating System   : 26200
+# Processor Detail   : 13th Gen Intel(R) Core(TM) i7-13620H
+# CPU Frequency      : 2918 MHz
+# CPU Physical cores : 10
+# CPU Logical cores  : 16
+# Host memory        : 16858 MB
+# Swap memory        : 23622 MB
+# Total Virtual      : 40480 MB
+# Available Virtual  : 6818 MB
+#-----------------------------------------------------------
+source xsim.dir/photo_video/xsim_script.tcl
+# xsim {photo_video} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+PASS actual photo WAIT -> committed OK; write ERROR -> retained-frame retry WAIT -> OK; no auto-gallery; live DDR video, manual gallery and delete
+$finish called at time : 18432890 ns : File "E:/Efinity_Project/EfinityFPGAfour/images/image2_four_boot/image2_menu_video_tb.sv" Line 490
+run: Time (s): cpu = 00:00:00 ; elapsed = 00:00:32 . Memory (MB): peak = 196.309 ; gain = 0.000
+exit
+INFO: xsimkernel Simulation Memory Usage: 34556 KB (Peak: 34556 KB), Simulation CPU Usage: 29499 ms
+INFO: [Common 17-206] Exiting xsim at Thu Oct 29 21:59:44 2026...

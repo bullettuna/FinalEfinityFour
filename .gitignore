@@ -26,3 +26,6 @@ __pycache__/
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# 报告类日志体积很小，是构建/烧录证据，需要保留
+!reports/**/*.log

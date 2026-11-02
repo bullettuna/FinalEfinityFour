@@ -1,0 +1,37 @@
+#-----------------------------------------------------------
+# xsim v2024.2 (64-bit)
+# SW Build 5239630 on Fri Nov 08 22:35:27 MST 2024
+# IP Build 5239520 on Sun Nov 10 16:12:51 MST 2024
+# SharedData Build 5239561 on Fri Nov 08 14:39:27 MST 2024
+# Start of session at: Thu Oct 29 21:57:11 2026
+# Process ID         : 30036
+# Current directory  : E:/Efinity_Project/EfinityFPGAfour/work_sim/four_image/photo
+# Command line       : xsim.exe -log photo_render.log -mode tcl -source {xsim.dir/photo_render/xsim_script.tcl}
+# Log file           : E:/Efinity_Project/EfinityFPGAfour/work_sim/four_image/photo/photo_render.log
+# Journal file       : E:/Efinity_Project/EfinityFPGAfour/work_sim/four_image/photo\xsim.jou
+# Running On         : study_person
+# Platform           : Windows Server 2016 or Windows 10
+# Operating System   : 26200
+# Processor Detail   : 13th Gen Intel(R) Core(TM) i7-13620H
+# CPU Frequency      : 2918 MHz
+# CPU Physical cores : 10
+# CPU Logical cores  : 16
+# Host memory        : 16858 MB
+# Swap memory        : 23622 MB
+# Total Virtual      : 40480 MB
+# Available Virtual  : 6866 MB
+#-----------------------------------------------------------
+source xsim.dir/photo_render/xsim_script.tcl
+# xsim {photo_render} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+PASS closed menu is a pure three-clock delay (608000 pixels)
+PASS BROWSE overlay: 155520 menu pixels, 134712 backdrop, 20808 ink, 63 marker
+PASS EDIT overlay: 99 bracket pixels
+PASS menu close is transparent again (305597 pixels)
+PASS menu_text_render: fixed three-clock VS/HS/DE/RGB alignment, real SD/delete page and feedback glyphs
+$finish called at time : 33303430 ns : File "E:/Efinity_Project/EfinityFPGAfour/images/image2_four_boot/image2_menu_render_tb.sv" Line 273
+run: Time (s): cpu = 00:00:00 ; elapsed = 00:00:20 . Memory (MB): peak = 195.289 ; gain = 0.000
+exit
+INFO: xsimkernel Simulation Memory Usage: 31392 KB (Peak: 31392 KB), Simulation CPU Usage: 15577 ms
+INFO: [Common 17-206] Exiting xsim at Thu Oct 29 21:57:35 2026...

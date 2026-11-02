@@ -112,3 +112,6 @@ __pycache__/
 
 # Generated image2 P4/menu releases; source and build tools remain tracked.
 /releases/image2/
+
+# DDR3 IP 初始化数据，重建必需（上面的 *.bin 是给构建产物用的）
+!ip/DdrCtrl/**/*.bin
